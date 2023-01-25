@@ -8,7 +8,7 @@ FOS_REGISTRY = {
       "appManager",
       "fontManager",
       "raster",
-      "ThemeManager"
+      "UIManager"
    },
    screen_model = models.FOS.phone.base.screen,
 }
