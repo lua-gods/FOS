@@ -45,7 +45,7 @@ events.RENDER:register(function(dt, context)
    if player:isLoaded() then
       if context == "FIRST_PERSON" then
          applyTransformPreset(config.first_person)
-      elseif context == "RENDER" then
+      elseif context == "RENDER" or context == "FIGURA_GUI" or context == "MINECRAFT_GUI" then
          applyTransformPreset(config.third_person)
       end
    end
