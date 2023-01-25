@@ -45,7 +45,7 @@ events.RENDER:register(function(dt, context)
    if player:isLoaded() then
       if context == "FIRST_PERSON" then
          applyTransformPreset(config.first_person)
-      else
+      elseif context == "RENDER" then
          applyTransformPreset(config.third_person)
       end
    end
