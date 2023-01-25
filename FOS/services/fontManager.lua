@@ -35,22 +35,21 @@ end
 
 local fonts = {}
 
-local reg = require(FOS_RELATIVE_PATH..".registry")
 for key, texture in pairs(textures:getTextures()) do
    local tex_name = texture:getName()
-   if tex_name:sub(1,#reg.font_texture_prefix) == reg.font_texture_prefix then
+   if tex_name:sub(1,#FOS_REGISTRY.font_texture_prefix) == FOS_REGISTRY.font_texture_prefix then
       
       local font_package = font_manager:renderFont(texture)
-      local font_namespace = tex_name:sub(#reg.font_texture_prefix+1,#tex_name)
+      local font_namespace = tex_name:sub(#FOS_REGISTRY.font_texture_prefix+1,#tex_name)
 
-      config:setName(reg.system_name..".".."fontcache")
+      config:setName(FOS_REGISTRY.system_name..".".."fontcache")
       local cache = config:load(font_namespace)
 
       if cache then
          fonts[font_namespace] = cache
       else
-         fonts[tex_name:sub(#reg.font_texture_prefix,#tex_name)] = font_package
-         config:setName(reg.system_name..".".."fontcache")
+         fonts[tex_name:sub(#FOS_REGISTRY.font_texture_prefix,#tex_name)] = font_package
+         config:setName(FOS_REGISTRY.system_name..".".."fontcache")
          config:save(font_namespace,font_package)
       end
    end

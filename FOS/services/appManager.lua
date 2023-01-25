@@ -1,1 +1,0 @@
---- purpose: Manages what apps the user has and whats currently in display

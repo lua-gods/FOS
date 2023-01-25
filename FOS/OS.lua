@@ -8,11 +8,11 @@ for id, index in pairs(table_path) do
       relative_path = relative_path.."."
    end
 end
-local reg = require(relative_path..".registry")
-reg.root_path = relative_path
+require(relative_path..".registry")
+FOS_REGISTRY.root_path = relative_path
 FOS_RELATIVE_PATH = relative_path
 
-for key, value in pairs(reg.services) do
+for key, value in pairs(FOS_REGISTRY.services) do
    require(FOS_RELATIVE_PATH..".services."..value)
 end
 
