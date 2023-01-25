@@ -1,4 +1,4 @@
-models.FOS.phone.screen:setPrimaryRenderType("EMISSIVE_SOLID")
+models.FOS.phone.base.screen:setPrimaryRenderType("EMISSIVE_SOLID")
 local config = {
    third_person = {
       pivot = vectors.vec3(4,22,0),
@@ -15,23 +15,23 @@ local config = {
 }
 
 local function applyTransformPreset(preset)
-   models.FOS:setScale(preset.scale)
+   models.FOS.phone:setScale(preset.scale)
    if player:isLeftHanded() then
       models.FOS:setParentType("LEFT_ARM")
-      models.FOS:setPivot(
+      models.FOS.phone:setPivot(
          -preset.pivot.x-preset.offset.x,
          preset.pivot.y-preset.offset.y,
          -preset.pivot.z-preset.offset.z)
-      models.FOS:setPos(-preset.offset.x,preset.offset.y,preset.offset.z)
-      models.FOS.phone:setRot(preset.rotation.x,-preset.rotation.y,-preset.rotation.z)
+      models.FOS.phone:setPos(-preset.offset.x,preset.offset.y,preset.offset.z)
+      models.FOS.phone.base:setRot(preset.rotation.x,-preset.rotation.y,-preset.rotation.z)
    else
       models.FOS:setParentType("RIGHT_ARM")
-      models.FOS:setPivot(
+      models.FOS.phone:setPivot(
          preset.pivot.x-preset.offset.x,
          preset.pivot.y-preset.offset.y,
          preset.pivot.z-preset.offset.z)
-      models.FOS:setPos(preset.offset.x,preset.offset.y,preset.offset.z)
-      models.FOS.phone:setRot(preset.rotation)
+      models.FOS.phone:setPos(preset.offset.x,preset.offset.y,preset.offset.z)
+      models.FOS.phone.base:setRot(preset.rotation)
    end
 end
 

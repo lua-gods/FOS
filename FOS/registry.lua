@@ -10,6 +10,6 @@ FOS_REGISTRY = {
       "raster",
       "ThemeManager"
    },
-   screen_model = models.FOS.phone.screen,
+   screen_model = models.FOS.phone.base.screen,
 }
 
