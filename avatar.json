@@ -1,5 +1,6 @@
 {
-    "authors":["GNamimates","Auria/Dragekk","§f§nLibraries Used","..."],
+    "authors":["GNamimates","Auria/Dragekk","§f§nLibraries Used","KattEventsAPI"],
     "color":"#92A1B9",
-    "description":""
+    "description":"",
+    "autoScripts": ["phone"]
 }

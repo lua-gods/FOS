@@ -1,4 +1,4 @@
-
+models.FOS.phone.screen:setPrimaryRenderType("EMISSIVE_SOLID")
 local config = {
    third_person = {
       pivot = vectors.vec3(4,22,0),
@@ -41,12 +41,14 @@ end)
 if not host:isHost() then return end
 
 
-events.WORLD_RENDER:register(function (td)
+events.RENDER:register(function (td,context)
    if player:isLoaded() then
-      if renderer:isFirstPerson() then
+      if context == "FIRST_PERSON" then
          applyTransformPreset(config.first_person)
       else
          applyTransformPreset(config.third_person)
       end
    end
 end)
+
+local os = require("FOS.OS")
