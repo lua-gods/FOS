@@ -1,1 +1,0 @@
----purpose: Handles the Themes
