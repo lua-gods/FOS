@@ -11,4 +11,5 @@ local r = {
       "ThemeManager"
    },
 }
+
 return r
