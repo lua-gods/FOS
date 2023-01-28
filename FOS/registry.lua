@@ -12,4 +12,3 @@ FOS_REGISTRY = {
    },
    screen_model = models.FOS.phone.base.screen,
 }
-
