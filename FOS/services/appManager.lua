@@ -1,4 +1,6 @@
-APP = {}
+APP = {
+    app = nil,
+}
 
 local app_list = {}
 
@@ -8,9 +10,6 @@ local loaded_apps_count = 0
 
 -- list of apps (to not install app twice)
 local loaded_apps = {}
-
--- app while installing
-local app
 
 -- load app
 local function loadApp(path, app_type)
@@ -22,7 +21,7 @@ local function loadApp(path, app_type)
 
     --
     apps_count = apps_count + 1
-    app = nil
+    APP.app = nil
 
     --load app
     local loaded = pcall(require, path)
@@ -36,28 +35,35 @@ local function loadApp(path, app_type)
     -- app loaded
     loaded_apps_count = loaded_apps_count + 1
 
-    table.insert(app_list, app)
+    table.insert(app_list, APP.app)
 end
+
 
 -- begin function for apps
 function APP.begin(name)
     if app then
         error("Can't create app second time", 2)
     else
-        app = {
+        APP.app = {
             id = tostring(name)
         }
     end
 
-    return app
+    return APP.app
 end
 
+
 -- Load apps that are not loaded
+local loading_apps = false
 function APP.loadApps()
+    if loading_apps then
+        return
+    end
+    loading_apps = true
+
     for _, name in ipairs(listFiles(FOS_RELATIVE_PATH..".apps.system")) do
         loadApp(name, "system")
     end
-
     for _, name in ipairs(listFiles(FOS_RELATIVE_PATH..".apps.user")) do
         loadApp(name, "user")
     end
@@ -65,4 +71,6 @@ function APP.loadApps()
     if apps_count ~= loaded_apps_count then
         print("not loaded apps: "..(apps_count - loaded_apps_count))
     end
+
+    loading_apps = false
 end

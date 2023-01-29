@@ -1,1 +1,1 @@
-APP.begin("home")
+local app = APP.begin("home")
