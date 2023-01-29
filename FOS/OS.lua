@@ -19,6 +19,4 @@ for key, value in pairs(FOS_REGISTRY.services) do
    require(FOS_RELATIVE_PATH..".services."..value)
 end
 
-APP.loadApps()
-
 return os

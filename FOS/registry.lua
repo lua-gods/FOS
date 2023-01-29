@@ -5,10 +5,13 @@ FOS_REGISTRY = {
    font_texture_prefix = "font.", -- every texture with this prefix will be converted into a fontmap
    services = { -- a list of things that gets called as the FOS boots up, order from top to bottom
       "AppDevelopmentKit",
-      "appManager",
       "fontManager",
       "raster",
-      "UIManager"
+      "UIManager",
+      "eventsManager",
+      "appManager",
    },
    screen_model = models.FOS.phone.base.screen,
+   home_app = "root:home",
+   
 }

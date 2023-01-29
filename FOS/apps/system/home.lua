@@ -1,1 +1,0 @@
-local app = APP.begin("home")
