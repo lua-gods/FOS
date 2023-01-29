@@ -5,6 +5,7 @@ APP = {
 
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
+local uiManager = require(FOS_RELATIVE_PATH..".services.UIManager")
 
 -- apps amount
 local apps_count = 0
@@ -51,7 +52,10 @@ function APP.begin(name)
 
     local app = {
         id = current_app_type..":"..tostring(name),
-        events = eventManager.newEventsTable()
+        events = eventManager.newEventsTable(),
+        pages = {},
+        setPage = appManager.setPage,
+        current_page = nil
     }
 
     APP.apps[app.id] = app
@@ -67,7 +71,22 @@ function APP.open(name)
         return
     end
 
+    APP.app.current_page = nil
+
     eventManager.runEvent("INIT")
+
+    if APP.app.current_page == nil then
+        appManager.setPage()
+    end
+end
+
+function appManager.setPage(page_name)
+    if page_name == nil then
+        page_name = "main"
+    end
+
+    APP.app.current_page = page_name
+    print("SET PAGE TO "..tostring(page_name))
 end
 
 -- Load apps that are not loaded
