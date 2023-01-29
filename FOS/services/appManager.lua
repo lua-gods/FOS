@@ -60,6 +60,16 @@ function APP.begin(name)
 end
 
 
+-- open app
+function APP.open(name)
+    local app_to_load = APP.apps[name]
+    if app_to_load == nil then
+        return
+    end
+
+    eventManager.runEvent("INIT")
+end
+
 -- Load apps that are not loaded
 local loading_apps = false
 function appManager.loadApps()
@@ -80,6 +90,8 @@ function appManager.loadApps()
     end
 
     loading_apps = false
+
+    APP.open("root:home")
 end
 
 

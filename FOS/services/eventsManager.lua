@@ -9,4 +9,8 @@ function eventsManager.newEventsTable()
     return tbl
 end
 
+function eventsManager.runEvent(event_name)
+    APP.app.events[event_name]()
+end
+
 return eventsManager
