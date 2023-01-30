@@ -5,7 +5,8 @@ APP = {
 
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
-local uiManager = require(FOS_RELATIVE_PATH..".services.UIManager")
+local raster = require(FOS_RELATIVE_PATH..".services.raster")
+-- local uiManager = require(FOS_RELATIVE_PATH..".services.UIManager")
 
 -- apps amount
 local apps_count = 0
@@ -86,7 +87,8 @@ function appManager.setPage(page_name)
     end
 
     APP.app.current_page = page_name
-    print("SET PAGE TO "..tostring(page_name))
+    
+    raster.draw()
 end
 
 -- Load apps that are not loaded

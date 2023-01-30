@@ -1,7 +1,21 @@
 -- Purpose: Font rendering for textures
 -->========================================[ API ]=========================================<--
 local font_manager = {}
+local fonts = {}
 local char_map = "`1234567890-=~!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;'ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?\\|"
+
+function font_manager:text2pixels(font_name, text)
+   local characters = fonts[font_name]
+
+   local compound = {}
+   for i = 1, text:len(), 1 do
+      local char = text:sub(i, i)
+      local c = characters[char]
+      table.insert(compound,c)
+   end
+
+   return compound
+end
 
 function font_manager:renderFont(texture)
    local character_id = 1
@@ -27,28 +41,27 @@ function font_manager:renderFont(texture)
          offset = x
       end
    end
-   font_package["WHITESPACE"] = {data={},width=3}
+   font_package[" "] = {bitmap={},width=3}
+   font_package["\n"] = {bitmap={},newline=true}
    return font_package
 end
 
 -->========================================[ MANAGER ]=========================================<--
 
-local fonts = {}
-
 for key, texture in pairs(textures:getTextures()) do
    local tex_name = texture:getName()
    if tex_name:sub(1,#FOS_REGISTRY.font_texture_prefix) == FOS_REGISTRY.font_texture_prefix then
       
-      local font_package = font_manager:renderFont(texture)
       local font_namespace = tex_name:sub(#FOS_REGISTRY.font_texture_prefix+1,#tex_name)
-
+      
       config:setName(FOS_REGISTRY.system_name..".".."fontcache")
       local cache = config:load(font_namespace)
-
+      
       if cache then
          fonts[font_namespace] = cache
       else
-         fonts[tex_name:sub(#FOS_REGISTRY.font_texture_prefix,#tex_name)] = font_package
+         local font_package = font_manager:renderFont(texture)
+         fonts[tex_name:sub(#FOS_REGISTRY.font_texture_prefix+1,#tex_name)] = font_package
          config:setName(FOS_REGISTRY.system_name..".".."fontcache")
          config:save(font_namespace,font_package)
       end
