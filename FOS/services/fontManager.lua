@@ -1,5 +1,6 @@
 -- Purpose: Font rendering for textures
 -->========================================[ API ]=========================================<--
+local font_version = "cookie" -- font version to not use cache when its old (also maybe we should get rid of cache? i dont know)
 local font_manager = {}
 local fonts = {}
 font_manager.fonts = fonts
@@ -31,6 +32,7 @@ function font_manager:renderFont(texture)
    end
    font_package[" "] = {bitmap={},width=3}
    font_package["\n"] = {bitmap={},newline_height=8}
+   font_package.VERSION = font_version
    return font_package
 end
 
@@ -45,9 +47,10 @@ for key, texture in pairs(textures:getTextures()) do
       config:setName(FOS_REGISTRY.system_name..".".."fontcache")
       local cache = config:load(font_namespace)
       
-      if cache then
+      if cache and cache.VERSION == font_version then
          fonts[font_namespace] = cache
       else
+         print("UPDATE")
          local font_package = font_manager:renderFont(texture)
          fonts[tex_name:sub(#FOS_REGISTRY.font_texture_prefix+1,#tex_name)] = font_package
          config:setName(FOS_REGISTRY.system_name..".".."fontcache")
