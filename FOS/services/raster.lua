@@ -8,23 +8,25 @@ local screen = textures:newTexture(FOS_REGISTRY.system_name..".screen",FOS_REGIS
 FOS_REGISTRY.screen_model:setPrimaryTexture("CUSTOM",screen)
 
 local function drawText(obj)
-   local characters = fontManager:text2pixels("minimojangles", tostring(obj.text))
-
    local text_pos = obj.pos or vec(0, 0)
+   local text = tostring(obj.text)
 
    local x, y = 0, 0
-   for i, data in pairs(characters) do
-      for _, pos in ipairs(data.bitmap) do
-         local pixel_x, pixel_y = text_pos.x + pos.x + x, text_pos.y + pos.y + y
-         if pixel_x >= 0 and pixel_y >= 0 and pixel_x < FOS_REGISTRY.resolution.x and pixel_y < FOS_REGISTRY.resolution.y then
-            screen:setPixel(text_pos.x + pos.x + x, text_pos.y + pos.y + y, vec(1, 1, 1, 1))
+   for i = 1, #text do
+      local char = text:sub(i, i)
+      local data = fontManager.fonts["minimojangles"][char]
+      if data then
+         if data.newline_height then
+            x, y = 0, y + data.newline_height
+         else
+            for _, pos in ipairs(data.bitmap) do
+               local pixel_x, pixel_y = text_pos.x + pos.x + x, text_pos.y + pos.y + y
+               if pixel_x >= 0 and pixel_y >= 0 and pixel_x < FOS_REGISTRY.resolution.x and pixel_y < FOS_REGISTRY.resolution.y then
+                  screen:setPixel(text_pos.x + pos.x + x, text_pos.y + pos.y + y, vec(1, 1, 1, 1))
+               end
+            end
+            x = x + data.width
          end
-      end
-      if data.newline then
-         x = 0
-         y = y + 8
-      else
-         x = x + data.width
       end
    end
 end

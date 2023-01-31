@@ -2,20 +2,8 @@
 -->========================================[ API ]=========================================<--
 local font_manager = {}
 local fonts = {}
+font_manager.fonts = fonts
 local char_map = "`1234567890-=~!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}asdfghjkl;'ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?\\|"
-
-function font_manager:text2pixels(font_name, text)
-   local characters = fonts[font_name]
-
-   local compound = {}
-   for i = 1, text:len(), 1 do
-      local char = text:sub(i, i)
-      local c = characters[char]
-      table.insert(compound,c)
-   end
-
-   return compound
-end
 
 function font_manager:renderFont(texture)
    local character_id = 1
@@ -42,7 +30,7 @@ function font_manager:renderFont(texture)
       end
    end
    font_package[" "] = {bitmap={},width=3}
-   font_package["\n"] = {bitmap={},newline=true}
+   font_package["\n"] = {bitmap={},newline_height=8}
    return font_package
 end
 

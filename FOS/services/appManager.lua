@@ -35,7 +35,7 @@ local function loadApp(path, app_type)
     local loaded = pcall(require, path)
 
     -- app couldnt be loaded
-    if not loaded then
+    if not loaded or not APP.app then
         print("could not load: "..path)
         return
     end
@@ -71,6 +71,8 @@ function APP.open(name)
     if app_to_load == nil then
         return
     end
+
+    APP.app = app_to_load
 
     APP.app.current_page = nil
 
