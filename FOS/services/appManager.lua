@@ -67,7 +67,7 @@ end
 
 -- open app
 function APP.open(name)
-    local app_to_load = APP.apps[name]
+    local app_to_load = APP.apps[name] or APP.apps[FOS_REGISTRY.home_app]
     if app_to_load == nil then
         return
     end
@@ -89,6 +89,11 @@ function appManager.setPage(page_name)
     end
 
     APP.app.current_page = page_name
+    APP.app.selected_item = -1
+
+    if APP.app.pages[APP.app.current_page] == nil then
+        APP.app.pages[APP.app.current_page] = {}
+    end
     
     raster.draw()
 end
@@ -114,7 +119,7 @@ function appManager.loadApps()
 
     loading_apps = false
 
-    APP.open("root:home")
+    APP.open()
 end
 
 
