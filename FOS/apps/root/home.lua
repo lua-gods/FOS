@@ -8,7 +8,7 @@ app.pages.main = {
 
 local elements_count = #app.pages.main
 
-function app.events.INIT()
+function app.events.init()
     for i = elements_count + 1, #app.pages.main do
         app.pages.main[i] = nil
     end
@@ -23,4 +23,8 @@ function app.events.INIT()
     end
 
     app.setPage("main") -- note: this line is not needed, default page name is "main"
+end
+
+function app.events.key_press(KEY)
+    print(KEY)
 end

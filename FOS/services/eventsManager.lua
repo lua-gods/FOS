@@ -5,12 +5,13 @@ function eventsManager.newEventsTable()
     local tbl = KattEventAPI.eventifyTable({})
 
     tbl.INIT = KattEventAPI.newEvent()
+    tbl.KEY_PRESS = KattEventAPI.newEvent()
 
     return tbl
 end
 
-function eventsManager.runEvent(event_name)
-    APP.app.events[event_name]()
+function eventsManager.runEvent(event_name, ...)
+    APP.app.events[event_name](...)
 end
 
 return eventsManager
