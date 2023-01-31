@@ -10,6 +10,7 @@ FOS_REGISTRY = {
       "UIManager",
       "eventsManager",
       "input",
+      "textureManager",
       "appManager",
    },
    screen_model = models.FOS.phone.base.screen,

@@ -13,32 +13,48 @@ local function setPixel(x, y, rgba)
    end
 end
 
-local function drawText(obj, isSelected)
+local draw_functions = {
+   text = function(obj, isSelected)
    local font = "minimojangles"
-   local text_pos = obj.pos or vec(0, 0)
-   local text = tostring(obj.text)
-
-   local x, y = 0, 0
-   for i = 1, #text do
-      local data = fontManager.fonts[font][text:sub(i, i)]
-      if data then
-         if data.newline_height then
-            x, y = 0, y + data.newline_height
-         else
-            for _, pos in ipairs(data.bitmap) do
-               setPixel(text_pos.x + pos.x + x, text_pos.y + pos.y + y, vec(1, 1, 1, 1))
+      local render_pos = obj.pos or vec(0, 0)
+      local text = tostring(obj.text)
+   
+      local x, y = 0, 0
+      for i = 1, #text do
+         local data = fontManager.fonts[font][text:sub(i, i)]
+         if data then
+            if data.newline_height then
+               x, y = 0, y + data.newline_height
+            else
+               for _, pos in ipairs(data.bitmap) do
+                  setPixel(render_pos.x + pos.x + x, render_pos.y + pos.y + y, vec(1, 1, 1, 1))
+               end
+               x = x + data.width
             end
-            x = x + data.width
+         end
+      end
+   
+      if isSelected then
+         for line_y = 0, y + fontManager.fonts[font]["\n"].newline_height - 1 do
+            setPixel(render_pos.x, render_pos.y + line_y, vec(1, 0.5, 0.8, 1))
+         end
+      end
+   end,
+   texture = function(obj, isSelected)
+      local render_pos = obj.pos or vec(0, 0)
+      local size = obj.size or 1
+      local inverted_size = 1 / size
+      local texture = obj.texture
+
+      local dimensions = texture:getDimensions() * size
+      for x = 0, dimensions.x - 1 do
+         for y = 0, dimensions.y - 1 do
+            local pixel = texture:getPixel(x * inverted_size, y * inverted_size)
+            setPixel(render_pos.x + x, render_pos.y + y, pixel)
          end
       end
    end
-
-   if isSelected then
-      for line_y = 0, y + fontManager.fonts[font]["\n"].newline_height - 1 do
-         setPixel(text_pos.x, text_pos.y + line_y, vec(1, 0.5, 0.8, 1))
-      end
-   end
-end
+}
 
 function raster.draw()
    local page = APP.app.pages[APP.app.current_page]
@@ -49,8 +65,8 @@ function raster.draw()
 
    for i, v in ipairs(page) do
       local isSelected = v.pressAction and i == APP.app.selected_item
-      if v.type == "text" then
-         drawText(v, isSelected)
+      if draw_functions[v.type] then
+         draw_functions[v.type](v, isSelected)
       end
    end
 

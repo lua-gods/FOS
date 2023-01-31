@@ -32,11 +32,12 @@ local function loadApp(path, app_type)
     current_app_type = app_type
 
     --load app
-    local loaded = pcall(require, path)
+    local loaded, error = pcall(require, path)
 
     -- app couldnt be loaded
     if not loaded or not APP.app then
         print("could not load: "..path)
+        print(error)
         return
     end
 
