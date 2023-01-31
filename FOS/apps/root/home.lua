@@ -26,5 +26,9 @@ function app.events.init()
 end
 
 function app.events.key_press(KEY)
-    print(KEY)
+    if KEY == "DOWN" then
+        if APP.apps["user:exammmmpl"] then
+            APP.open("user:exammmmpl")
+        end
+    end
 end
