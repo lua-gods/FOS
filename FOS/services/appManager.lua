@@ -57,7 +57,8 @@ function APP.begin(name)
         events = eventManager.newEventsTable(),
         pages = {},
         setPage = appManager.setPage,
-        current_page = nil
+        current_page = nil,
+        redraw = raster.draw
     }
 
     APP.apps[app.id] = app
