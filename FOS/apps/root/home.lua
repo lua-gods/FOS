@@ -6,7 +6,8 @@ app.pages.main = {
     -- orientation = "portrait" -- not added yet
     {type = "texture", texture = wallpaper, size = 8},
 
-    {type = "text", text = "Hello World\nmeow\n\nyep this is\nhome screen", pos = vec(0, 0)},
+    {type = "text", text = "Hello World", color = vec(1, 1, 1, 1)},
+    {type = "text", text = "meow\n\nyep this is\nhome screen", pos = vec(0, 8)},
     {type = "text", text = "foxgirl", pos = vec(26, FOS_REGISTRY.resolution.y - 8)},
 }
 

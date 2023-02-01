@@ -24,7 +24,6 @@ end
 
 function texture.read(base64)
     local readed_texture = textures:read("texture_reader", base64) -- im not going to make base64 reader ok? we got figura already
-    -- host:saveTexture(readed_texture)
     local dimensions = readed_texture:getDimensions()
     local texture = texture.new(dimensions.x, dimensions.y)
 
