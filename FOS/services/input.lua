@@ -18,19 +18,18 @@ local function press(key)
 
     local page = APP.app.pages[APP.app.current_page]
     local currently_selected = APP.app.selected_item
+    local new_selected
     if key == "UP" then
         for i = currently_selected - 1, 1, -1 do
             if page[i] and page[i].pressAction then
-                APP.app.selected_item = i
-                raster.draw()
+                new_selected = i
                 break
             end
         end
     elseif key == "DOWN" then
         for i = currently_selected + 1, #page do
             if page[i] and page[i].pressAction then
-                APP.app.selected_item = i
-                raster.draw()
+                new_selected = i
                 break
             end
         end
@@ -38,6 +37,11 @@ local function press(key)
         if page[currently_selected] and type(page[currently_selected].pressAction) == "function" then
             page[currently_selected].pressAction()
         end
+    end
+
+    if new_selected then
+        APP.app.selected_item = new_selected
+        raster.draw({currently_selected, new_selected})
     end
 end
 
