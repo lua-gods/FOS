@@ -6,7 +6,7 @@ APP = {
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
 local raster = require(FOS_RELATIVE_PATH..".services.raster")
--- local uiManager = require(FOS_RELATIVE_PATH..".services.UIManager")
+local uiManager = require(FOS_RELATIVE_PATH..".libraries.textureAPI")
 
 -- apps amount
 local apps_count = 0
@@ -69,7 +69,7 @@ end
 
 -- open app
 function APP.open(name)
-    local app_to_load = APP.apps[name] or APP.apps[FOS_REGISTRY.home_app]
+    local app_to_load = APP.apps[name] or APP.apps[SYSTEM_REGISTRY.home_app]
     if app_to_load == nil then
         return
     end

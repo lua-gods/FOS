@@ -12,10 +12,10 @@ end
 
 require(relative_path..".registry")
 
-FOS_REGISTRY.root_path = relative_path
+SYSTEM_REGISTRY.root_path = relative_path
 FOS_RELATIVE_PATH = relative_path
 
-for key, value in pairs(FOS_REGISTRY.services) do
+for key, value in pairs(SYSTEM_REGISTRY.services) do
    require(FOS_RELATIVE_PATH..".services."..value)
 end
 

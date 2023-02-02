@@ -4,12 +4,12 @@ local fontManager = require(FOS_RELATIVE_PATH..".services.fontManager")
 local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
 local raster = {}
 
-local screen = textures:newTexture(FOS_REGISTRY.system_name..".screen",FOS_REGISTRY.resolution.x,FOS_REGISTRY.resolution.y)
+local screen = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen",SYSTEM_REGISTRY.resolution.x,SYSTEM_REGISTRY.resolution.y)
 
-FOS_REGISTRY.screen_model:setPrimaryTexture("CUSTOM",screen)
+SYSTEM_REGISTRY.screen_model:setPrimaryTexture("CUSTOM",screen)
 
 local function setPixel(x, y, rgba)
-   if x >= 0 and y >= 0 and x < FOS_REGISTRY.resolution.x and y < FOS_REGISTRY.resolution.y then
+   if x >= 0 and y >= 0 and x < SYSTEM_REGISTRY.resolution.x and y < SYSTEM_REGISTRY.resolution.y then
       screen:setPixel(x, y, rgba)
    end
 end
@@ -46,6 +46,7 @@ local draw_functions = {
       local size = obj.size or 1
       local inverted_size = 1 / size
       local texture = obj.texture
+      if texture == nil then return end
 
       local dimensions = texture:getDimensions() * size
       local color_to_use = select_color or color
@@ -64,8 +65,8 @@ function raster.draw()
    screen:fill(
       0,
       0,
-      FOS_REGISTRY.resolution.x,
-      FOS_REGISTRY.resolution.y,
+      SYSTEM_REGISTRY.resolution.x,
+      SYSTEM_REGISTRY.resolution.y,
       themeManager.readColor()
    )
 
