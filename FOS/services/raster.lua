@@ -61,7 +61,6 @@ local draw_functions = {
    
       local x, y = 0, 0
       local font_height = fontManager.fonts[font]["\n"].newline_height
-      local str = ""
       for i = 1, #text do
          local data = fontManager.fonts[font][text:sub(i, i)]
          if data then
@@ -69,7 +68,6 @@ local draw_functions = {
                x, y = 0, y + font_height
             else
                if render_pos.x + x + data.width >= draw_area.x and render_pos.x + x < draw_area.z and render_pos.y >= draw_area.y and render_pos.y + font_height <= draw_area.w then
-                  str = str..text:sub(i, i)
                   for _, pos in ipairs(data.bitmap) do
                      setPixel(render_pos.x + pos.x + x, render_pos.y + pos.y + y, color)
                   end
@@ -78,7 +76,6 @@ local draw_functions = {
             end
          end
       end
-      print(str)
    
       if select_color then
          for line_y = 0, y + font_height - 1 do
