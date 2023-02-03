@@ -22,7 +22,7 @@ local themes = {
 local themeManager = {themes = themes}
 
 function themeManager.updateTheme()
-    themes.default = themes.light
+    themes.default = themes[PUBLIC_REGISTRY.theme] or themes.light
 end 
 
 themeManager.updateTheme()

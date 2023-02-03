@@ -2,7 +2,8 @@ local app = APP.begin("exammmmpl")
 local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
 
 local function switch_theme()
-    themeManager.themes.default = themeManager.themes.default == themeManager.themes.light and themeManager.themes.dark or themeManager.themes.light
+    PUBLIC_REGISTRY.save("theme", PUBLIC_REGISTRY.theme == "dark" and "light" or "dark")
+    themeManager.updateTheme()
     app.redraw()
 end
 

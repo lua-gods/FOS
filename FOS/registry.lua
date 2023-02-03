@@ -4,6 +4,8 @@ SYSTEM_REGISTRY = {
    resolution = vectors.vec2(96,144), --12 * 8, 18 * 8
    font_texture_prefix = "font.", -- every texture with this prefix will be converted into a fontmap
    services = { -- a list of things that gets called as the FOS boots up, order from top to bottom
+      "registryManager",
+
       "AppDevelopmentKit",
 
       "fontManager",
@@ -18,6 +20,7 @@ SYSTEM_REGISTRY = {
    home_app = "root:home",
 }
 
-PUBLIC_REGISTRY = {
-   
+PUBLIC_REGISTRY = { -- default values, public registry is loaded in registry manager
+   save = nil, -- save public registry
+   theme = "light",
 }

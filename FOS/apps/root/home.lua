@@ -20,7 +20,7 @@ function app.events.init()
         app.pages.main[i] = nil
     end
 
-    app.pages.main[1].texture = themeManager.themes.default == themeManager.themes.light and wallpaper_light or wallpaper_dark
+    app.pages.main[1].texture = PUBLIC_REGISTRY.theme == "dark" and wallpaper_dark or wallpaper_light
 
     local y = 8*6
     for name in pairs(APP.apps) do
