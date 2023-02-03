@@ -60,22 +60,28 @@ local draw_functions = {
       local text = tostring(obj.text)
    
       local x, y = 0, 0
+      local font_height = fontManager.fonts[font]["\n"].newline_height
+      local str = ""
       for i = 1, #text do
          local data = fontManager.fonts[font][text:sub(i, i)]
          if data then
             if data.newline_height then
-               x, y = 0, y + data.newline_height
+               x, y = 0, y + font_height
             else
-               for _, pos in ipairs(data.bitmap) do
-                  setPixel(render_pos.x + pos.x + x, render_pos.y + pos.y + y, color)
+               if render_pos.x + x + data.width >= draw_area.x and render_pos.x + x < draw_area.z and render_pos.y >= draw_area.y and render_pos.y + font_height <= draw_area.w then
+                  str = str..text:sub(i, i)
+                  for _, pos in ipairs(data.bitmap) do
+                     setPixel(render_pos.x + pos.x + x, render_pos.y + pos.y + y, color)
+                  end
                end
                x = x + data.width
             end
          end
       end
+      print(str)
    
       if select_color then
-         for line_y = 0, y + fontManager.fonts[font]["\n"].newline_height - 1 do
+         for line_y = 0, y + font_height - 1 do
             setPixel(render_pos.x, render_pos.y + line_y, select_color)
          end
       end
