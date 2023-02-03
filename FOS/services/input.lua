@@ -1,7 +1,9 @@
+local input = {}
+
 local eventsManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
 local raster = require(FOS_RELATIVE_PATH..".services.raster")
 
-local input_keys = {
+local key_names = {
     ["key.keyboard.left"] = "LEFT",
     ["key.keyboard.up"] = "UP",
     ["key.keyboard.right"] = "RIGHT",
@@ -9,7 +11,21 @@ local input_keys = {
     ["key.keyboard.enter"] = "ENTER"
 }
 
-local function press(key)
+local keys = {}
+local press
+
+for key_path, display_name in pairs(key_names) do
+    local key = keybinds:newKeybind(display_name:lower(), key_path)
+
+    key.press = function()
+        press(display_name)
+    end
+
+    keys[display_name] = key
+end
+
+
+function press(key)
     if player:getItem(1).id ~= "minecraft:air" then
         return
     end
@@ -52,10 +68,10 @@ local function press(key)
     end
 end
 
-for key_path, display_name in pairs(input_keys) do
-    local key = keybinds:newKeybind(display_name:lower(), key_path)
-
-    key.press = function()
-        press(display_name)
+function input.isPressed(key)
+    if keys[key] then
+        return keys[key]:isPressed()
     end
 end
+
+return input

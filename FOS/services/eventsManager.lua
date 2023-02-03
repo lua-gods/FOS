@@ -7,6 +7,7 @@ function eventsManager.newEventsTable()
     tbl.INIT = KattEventAPI.newEvent()
     tbl.KEY_PRESS = KattEventAPI.newEvent()
     tbl.TICK = KattEventAPI.newEvent()
+    tbl.RENDER = KattEventAPI.newEvent()
 
     return tbl
 end
@@ -17,6 +18,12 @@ end
 
 function events.tick()
     eventsManager.runEvent("TICK")
+end
+
+function events.render(delta, context)
+    if context == "FIRST_PERSON" or context == "RENDER" then
+        eventsManager.runEvent("RENDER", delta)
+    end
 end
 
 return eventsManager

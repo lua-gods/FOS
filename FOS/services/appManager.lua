@@ -6,7 +6,8 @@ APP = {
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
 local raster = require(FOS_RELATIVE_PATH..".services.raster")
-local uiManager = require(FOS_RELATIVE_PATH..".libraries.textureAPI")
+local input = require(FOS_RELATIVE_PATH..".services.input")
+require(FOS_RELATIVE_PATH..".libraries.textureAPI")
 
 -- apps amount
 local apps_count = 0
@@ -56,9 +57,14 @@ function APP.begin(name)
         id = current_app_type..":"..tostring(name),
         events = eventManager.newEventsTable(),
         pages = {},
+
         setPage = appManager.setPage,
+        redraw = raster.draw,
+        isPressed = input.isPressed,
+
         current_page = nil,
-        redraw = raster.draw
+        selected_item = -1,
+        hide_on_home = false,
     }
 
     APP.apps[app.id] = app
