@@ -14,7 +14,8 @@ local function press(key)
         return
     end
 
-    eventsManager.runEvent("KEY_PRESS", key)
+    local play_sound = false
+    local stop_sound = eventsManager.runEvent("KEY_PRESS", key)
 
     local page = APP.app.pages[APP.app.current_page]
     local currently_selected = APP.app.selected_item
@@ -23,6 +24,7 @@ local function press(key)
         for i = currently_selected - 1, 1, -1 do
             if page[i] and page[i].pressAction then
                 new_selected = i
+                play_sound = true
                 break
             end
         end
@@ -30,18 +32,23 @@ local function press(key)
         for i = currently_selected + 1, #page do
             if page[i] and page[i].pressAction then
                 new_selected = i
+                play_sound = true
                 break
             end
         end
     elseif key == "ENTER" then
         if page[currently_selected] and type(page[currently_selected].pressAction) == "function" then
             page[currently_selected].pressAction()
+            play_sound = true
         end
     end
 
     if new_selected then
         APP.app.selected_item = new_selected
         raster.draw({currently_selected, new_selected})
+    end
+    if play_sound and not stop_sound then
+        sounds:playSound("ui.button.click", player:getPos(), 0.25, 2)
     end
 end
 
