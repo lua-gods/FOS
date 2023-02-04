@@ -50,7 +50,6 @@ for key, texture in pairs(textures:getTextures()) do
       if cache and cache.VERSION == font_version then
          fonts[font_namespace] = cache
       else
-         print("UPDATE")
          local font_package = font_manager:renderFont(texture)
          fonts[tex_name:sub(#SYSTEM_REGISTRY.font_texture_prefix+1,#tex_name)] = font_package
          config:setName(SYSTEM_REGISTRY.system_name..".".."fontcache")

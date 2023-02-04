@@ -20,7 +20,7 @@ local loaded_apps = {}
 
 -- load app
 local current_app_type
-local function loadApp(path, app_type) --path CONFIG.app will 
+local function loadApp(path, app_type)
     -- prevent installing app twice
     if loaded_apps[path] then
         return
@@ -34,15 +34,29 @@ local function loadApp(path, app_type) --path CONFIG.app will
     current_app_type = app_type
 
     --load app
-    local loaded, output_error = pcall(require, path)
-    if loaded and APP.app == nil and type(output_error) == "string" then
-        --exportable mode
-        local str = output_error
-        local func = load(output_error)
-        if type(func) == "function" then
-            loaded, output_error = pcall(func)
-            if loaded and APP.app then
-                configAppManager.exportable[APP.app.id] = str
+    local loaded, output_error
+    
+    if path:sub(1, 7) == "CONFIG." then
+        local str = configAppManager.apps[path]
+        if str then
+            local func = load(str)
+            if type(func) == "function" then
+                loaded, output_error = pcall(func)
+            elseif type(func) == "string" then
+                output_error = func
+            end
+        end
+    else
+        loaded, output_error = pcall(require, path)
+        if loaded and APP.app == nil and type(output_error) == "string" then
+            --exportable mode
+            local str = output_error
+            local func = load(output_error)
+            if type(func) == "function" then
+                loaded, output_error = pcall(func)
+                if loaded and APP.app then
+                    configAppManager.exportable[APP.app.id] = str
+                end
             end
         end
     end 
@@ -50,7 +64,7 @@ local function loadApp(path, app_type) --path CONFIG.app will
     -- app couldnt be loaded
     if loaded == false or APP.app == nil then
         print("could not load: "..path)
-        print(output_error:sub(1, 128))
+        print(tostring(output_error):sub(1, 128))
         return
     end
 
@@ -128,7 +142,7 @@ end
 
 -- Load apps that are not loaded
 local loading_apps = false
-function appManager.loadApps()
+function APP.loadApps()
     if loading_apps then
         return
     end
@@ -142,6 +156,10 @@ function appManager.loadApps()
         loadApp(name, "user")
     end
 
+    for name in pairs(configAppManager.apps) do
+        loadApp(name, "user")
+    end
+
     if apps_count ~= loaded_apps_count then
         print("not loaded apps: "..(apps_count - loaded_apps_count))
     end
@@ -152,6 +170,6 @@ function appManager.loadApps()
 end
 
 
-appManager.loadApps()
+APP.loadApps()
 
 return appManager
