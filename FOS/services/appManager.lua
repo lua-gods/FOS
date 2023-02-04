@@ -5,6 +5,7 @@ APP = {
 
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
+local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 local raster = require(FOS_RELATIVE_PATH..".services.raster")
 local input = require(FOS_RELATIVE_PATH..".services.input")
 require(FOS_RELATIVE_PATH..".libraries.textureAPI")
@@ -19,7 +20,7 @@ local loaded_apps = {}
 
 -- load app
 local current_app_type
-local function loadApp(path, app_type)
+local function loadApp(path, app_type) --path CONFIG.app will 
     -- prevent installing app twice
     if loaded_apps[path] then
         return
@@ -33,12 +34,23 @@ local function loadApp(path, app_type)
     current_app_type = app_type
 
     --load app
-    local loaded, error = pcall(require, path)
+    local loaded, output_error = pcall(require, path)
+    if loaded and APP.app == nil and type(output_error) == "string" then
+        --exportable mode
+        local str = output_error
+        local func = load(output_error)
+        if type(func) == "function" then
+            loaded, output_error = pcall(func)
+            if loaded and APP.app then
+                configAppManager.exportable[APP.app.id] = str
+            end
+        end
+    end 
 
     -- app couldnt be loaded
-    if not loaded or not APP.app then
+    if loaded == false or APP.app == nil then
         print("could not load: "..path)
-        print(error)
+        print(output_error:sub(1, 128))
         return
     end
 
@@ -54,7 +66,7 @@ function APP.begin(name)
     end
 
     local app = {
-        id = current_app_type..":"..tostring(name),
+        id = current_app_type..":"..tostring(name):gsub("\n", ""),
         events = eventManager.newEventsTable(),
         pages = {},
 
@@ -75,7 +87,15 @@ end
 
 -- open app
 function APP.open(name)
-    local app_to_load = APP.apps[name] or APP.apps[SYSTEM_REGISTRY.home_app]
+    local app_to_load = APP.apps[name] 
+    if app_to_load == nil then
+        if type(name) == "string" then
+            app_to_load = APP.apps["root."..name] or APP.apps["user."..name]
+        else
+            app_to_load = APP.apps[SYSTEM_REGISTRY.home_app]
+        end
+    end
+
     if app_to_load == nil then
         return
     end
@@ -117,6 +137,7 @@ function appManager.loadApps()
     for _, name in ipairs(listFiles(FOS_RELATIVE_PATH..".apps.root")) do
         loadApp(name, "root")
     end
+    
     for _, name in ipairs(listFiles(FOS_RELATIVE_PATH..".apps.user")) do
         loadApp(name, "user")
     end

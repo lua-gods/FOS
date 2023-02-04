@@ -13,6 +13,7 @@ SYSTEM_REGISTRY = {
       "ThemeManager",
       "input",
       "raster",
+      "configAppManager",
 
       "appManager",
    },
