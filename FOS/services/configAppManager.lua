@@ -25,7 +25,7 @@ end
 
 -- install
 function configAppManager.install()
-    if not (configAppManager.app_to_import and configAppManager.app_to_import_name) then
+    if not configAppManager.app_to_import then
         print("could not install app")
         return
     end
@@ -38,8 +38,21 @@ function configAppManager.install()
     configAppManager.apps[configAppManager.app_to_import_name] = configAppManager.app_to_import
     config:save("apps", configAppManager.apps)
 
+    configAppManager.app_to_import = nil
+    configAppManager.app_to_import_name = nil
+    
     APP.loadApps()
-    print("app installed")
+end
+
+function configAppManager.ignore_install()
+    if configAppManager.app_to_import then
+        config:setName("FOS.exported_app")
+        config:save("app_name", nil)
+        config:save("app", nil)
+        
+        configAppManager.app_to_import = nil
+        configAppManager.app_to_import_name = nil
+    end
 end
 
 config:setName("FOS.exported_app")

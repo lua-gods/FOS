@@ -8,6 +8,9 @@ local themes = {
 
         texture = vec(1, 1, 1, 1),
         texture_select = vec(0.75, 0.75, 0.75, 1),
+
+        rectangle = vec(0.9, 0.9, 0.9, 1),
+        rectangle_select = vec(0.8, 0.8, 0.8, 1),
     },
     dark = {
         background = vec(0.1, 0.1, 0.1, 1),
@@ -16,6 +19,9 @@ local themes = {
 
         texture = vec(1, 1, 1, 1),
         texture_select = vec(0.75, 0.75, 0.75, 1),
+
+        rectangle = vec(0.15, 0.15, 0.15, 1),
+        rectangle_select = vec(0.2, 0.2, 0.2, 1),
     }
 }
 

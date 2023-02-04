@@ -42,6 +42,9 @@ local function loadApp(path, app_type)
             local func = load(str)
             if type(func) == "function" then
                 loaded, output_error = pcall(func)
+                if loaded and APP.app then
+                    configAppManager.exportable[APP.app.id] = str
+                end
             elseif type(func) == "string" then
                 output_error = func
             end

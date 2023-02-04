@@ -1,4 +1,4 @@
--- return [=[
+return [=[
 local app = APP.begin("example")
 
 local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
