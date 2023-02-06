@@ -9,7 +9,7 @@ local texture_metatable = {
 }
 
 -- global
-function texture.new(x, y)
+function texture.newTexture(x, y)
     return setmetatable({
         width = x,
         height = y,
