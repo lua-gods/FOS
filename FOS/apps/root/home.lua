@@ -1,4 +1,4 @@
-local app = APP.begin("home")
+local app = APP.begin("home", "fos home screen")
 
 local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 
@@ -12,9 +12,7 @@ app.pages.main = {
     -- orientation = "portrait" -- not added yet
     {type = "texture", size = 8},
 
-    {type = "text", text = "Hello World", color = vec(1, 1, 1, 1)},
-    {type = "text", text = "meow\n\nyep this is\nhome screen", pos = vec(0, 8)},
-    {type = "text", text = "foxgirl", pos = vec(26, SYSTEM_REGISTRY.resolution.y - 8)},
+    {type = "text", text = "clock", color = vec(1, 1, 1)},
 }
 
 -- install app page
@@ -33,6 +31,19 @@ app.pages.install = {
 
 local elements_count = #app.pages.main -- needed to know where its safe to remove elements from list
 
+-- update clock
+local function update_clock(redraw)
+    local date = client:getDate()
+    local text = string.format("%02d:%02d", date.hour, date.minute)
+    
+    if app.pages.main[2].text ~= text then
+        app.pages.main[2].text = text
+        if redraw then
+            app.redraw({2})
+        end
+    end
+end
+
 -- main page
 function page_main()
     for i = elements_count + 1, #app.pages.main do
@@ -41,14 +52,14 @@ function page_main()
 
     app.pages.main[1].texture = PUBLIC_REGISTRY.theme == "dark" and wallpaper_dark or wallpaper_light
 
-    local y = 8*6
+    local y = 8*2
     for name, data in pairs(APP.apps) do
         if not data.hide_on_home then
             table.insert(
                 app.pages.main,
                 {
                     type = "text",
-                    text = name:match(":(.*)"),
+                    text = data.display_name,
                     pos = vec(0, y),
                     pressAction = function()
                         APP.open(name)
@@ -59,6 +70,7 @@ function page_main()
         end
     end
 
+    update_clock(false)
     app.setPage("main")
 end
 
@@ -67,12 +79,19 @@ function page_install()
     app.pages.install[4].text = configAppManager.app_to_import_name:sub(13, -1)
     app.setPage("install")
 end
-
+    
 -- called when app opened --
 function app.events.init()
     if configAppManager.app_to_import then
         page_install()
     else
         page_main()
+    end
+end
+
+-- called every tick --
+function app.events.tick()
+    if app.current_page == "main" then
+        update_clock(true)
     end
 end

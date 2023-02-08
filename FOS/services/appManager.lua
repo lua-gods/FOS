@@ -77,13 +77,15 @@ local function loadApp(path, app_type)
 end
 
 -- begin function for apps
-function APP.begin(name)
+function APP.begin(name, display_name)
     if APP.app then
         return error("Can't create app second time", 2)
     end
 
     local app = {
-        id = current_app_type..":"..tostring(name):gsub("\n", ""),
+        id = current_app_type..":"..tostring(name),
+        display_name = tostring(display_name or name):gsub("\n", ""),
+
         events = eventManager.newEventsTable(),
         pages = {},
 
@@ -93,6 +95,7 @@ function APP.begin(name)
 
         current_page = nil,
         selected_item = -1,
+
         hide_on_home = false,
     }
 
