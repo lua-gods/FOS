@@ -10,6 +10,8 @@ local wallpaper_dark = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88
 -- create main page
 app.pages.main = {
     -- orientation = "portrait" -- not added yet
+    orientation = "landscape", -- "landscape", true, 1 - is landscape, everything else is portrait
+
     {type = "texture", size = 8},
 
     {type = "text", text = "clock", color = vec(1, 1, 1)},

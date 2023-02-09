@@ -153,6 +153,10 @@ function appManager.setPage(page_name)
     raster.draw()
 end
 
+function APP.landscapeMode()
+    return APP.app.pages[APP.app.current_page].orientation == true or APP.app.pages[APP.app.current_page].orientation == 1 or APP.app.pages[APP.app.current_page].orientation == "landscape"
+end
+
 -- Load apps that are not loaded
 local loading_apps = false
 function APP.loadApps()
