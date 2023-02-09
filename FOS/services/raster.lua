@@ -7,14 +7,42 @@ local raster = {}
 local draw_area = vec(0, 0, 0, 0) -- limit drawing
 
 -- screen
-local screen = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen",SYSTEM_REGISTRY.resolution.x,SYSTEM_REGISTRY.resolution.y)
+local screen_portrait = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_portrait", SYSTEM_REGISTRY.resolution.x, SYSTEM_REGISTRY.resolution.y)
+local screen_landscape = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_landscape", SYSTEM_REGISTRY.resolution.y, SYSTEM_REGISTRY.resolution.x)
 
-SYSTEM_REGISTRY.screen_model:setPrimaryTexture("CUSTOM",screen)
+local current_screen = screen_portrait
+local screen_size = SYSTEM_REGISTRY.resolution
 
+local landscape_mode_uv_matrix = matrices.mat3(
+   vec(1, 0, 0),
+   vec(0, 1, 0),
+   vec(0, 0, 1)
+):rotate(0, 0, -90)
+
+local function set_screen_mode()
+   if APP.landscapeMode() then
+      current_screen = screen_landscape
+      screen_size = SYSTEM_REGISTRY.resolution.yx
+
+      SYSTEM_REGISTRY.screen_model:setUVMatrix(landscape_mode_uv_matrix)
+   else
+      current_screen = screen_portrait
+      screen_size = SYSTEM_REGISTRY.resolution
+      SYSTEM_REGISTRY.screen_model:setUVMatrix(matrices.mat3())
+   end
+
+   SYSTEM_REGISTRY.screen_model:setPrimaryTexture("CUSTOM", current_screen)
+end
+
+-- pixel functions
 local function setPixel(x, y, rgba)
    if x >= draw_area.x and y >= draw_area.y and x < draw_area.z and y < draw_area.w then
-      screen:setPixel(x, y, rgba)
+      current_screen:setPixel(x, y, rgba)
    end
+end
+
+local function fillPixels(x, y, width, height, color)
+   current_screen:fill(x, y, width, height, color)
 end
 
 -- get render size of something --
@@ -112,7 +140,7 @@ local draw_functions = {
       local x = math.max(draw_area.x, pos.x)
       local y = math.max(draw_area.y, pos.y)
 
-      screen:fill(
+      fillPixels(
          x,
          y,
          math.min(draw_area.z, pos.x + size.x) - x,
@@ -125,7 +153,7 @@ local draw_functions = {
 -- sets space where you can draw, used for optimization, not everything needs to be updated (mostly used for textures) --
 local function set_draw_area(page, elements)
    if type(elements) == "table" then
-      draw_area = vec(SYSTEM_REGISTRY.resolution.x - 1, SYSTEM_REGISTRY.resolution.y - 1, 0, 0)
+      draw_area = vec(screen_size.x - 1, screen_size.y - 1, 0, 0)
       for _, i in pairs(elements) do
          if page[i] and render_size[page[i].type] then
             local pos_size = render_size[page[i].type](page[i])
@@ -138,20 +166,22 @@ local function set_draw_area(page, elements)
       end
       draw_area.x = math.max(draw_area.x, 0)
       draw_area.y = math.max(draw_area.y, 0)
-      draw_area.z = math.min(draw_area.z, SYSTEM_REGISTRY.resolution.x)
-      draw_area.w = math.min(draw_area.w, SYSTEM_REGISTRY.resolution.y)
+      draw_area.z = math.min(draw_area.z, screen_size.x)
+      draw_area.w = math.min(draw_area.w, screen_size.y)
    else
-      draw_area = vec(0, 0, SYSTEM_REGISTRY.resolution.x, SYSTEM_REGISTRY.resolution.y)
+      draw_area = vec(0, 0, screen_size.x, screen_size.y)
    end
 end
 
 -- draw screen --
 function raster.draw(elements)
    local page = APP.app.pages[APP.app.current_page]
+   
+   set_screen_mode()
 
    set_draw_area(page, elements)
 
-   screen:fill(
+   fillPixels(
       draw_area.x, draw_area.y, draw_area.z - draw_area.x, draw_area.w - draw_area.y,
       themeManager.readColor()
    )
@@ -167,7 +197,7 @@ function raster.draw(elements)
       end
    end
 
-   screen:update()
+   current_screen:update()
 end
 
 -- return --
