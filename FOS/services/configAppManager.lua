@@ -15,7 +15,7 @@ function configAppManager.export(name)
     end
     
     local str = configAppManager.exportable[name]
-    config:setName("FOS.exported_app")
+    config:setName(SYSTEM_REGISTRY.system_name..".exported_app")
     config:save("app_name", tostring(name))
     config:save("app", str)
 
@@ -30,11 +30,11 @@ function configAppManager.install()
         return
     end
     
-    config:setName("FOS.exported_app")
+    config:setName(SYSTEM_REGISTRY.system_name..".exported_app")
     config:save("app_name", nil)
     config:save("app", nil)
 
-    config:setName("FOS.apps")
+    config:setName(SYSTEM_REGISTRY.system_name..".apps")
     configAppManager.apps[configAppManager.app_to_import_name] = configAppManager.app_to_import
     config:save("apps", configAppManager.apps)
 
@@ -46,7 +46,7 @@ end
 
 function configAppManager.ignore_install()
     if configAppManager.app_to_import then
-        config:setName("FOS.exported_app")
+        config:setName(SYSTEM_REGISTRY.system_name..".exported_app")
         config:save("app_name", nil)
         config:save("app", nil)
         
@@ -55,7 +55,7 @@ function configAppManager.ignore_install()
     end
 end
 
-config:setName("FOS.exported_app")
+config:setName(SYSTEM_REGISTRY.system_name..".exported_app")
 local import_app = config:load("app")
 local import_app_name = config:load("app_name")
 if type(import_app) == "string" and type(import_app_name) == "string" then
@@ -64,7 +64,7 @@ if type(import_app) == "string" and type(import_app_name) == "string" then
 end
 
 -- load apps
-config:setName("FOS.apps")
+config:setName(SYSTEM_REGISTRY.system_name..".apps")
 local apps = config:load("apps")
 if type(apps) == "table" then
     configAppManager.apps = apps

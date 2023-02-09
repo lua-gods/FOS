@@ -15,6 +15,7 @@ app.pages.main = {
     {type = "text", text = "clock", color = vec(1, 1, 1)},
 }
 
+
 -- install app page
 local page_main, page_install
 

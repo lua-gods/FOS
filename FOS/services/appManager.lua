@@ -3,11 +3,15 @@ APP = {
     apps = {}
 }
 
+-- app manager apis
 local appManager = {}
 local eventManager = require(FOS_RELATIVE_PATH..".services.eventsManager")
 local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 local raster = require(FOS_RELATIVE_PATH..".services.raster")
 local input = require(FOS_RELATIVE_PATH..".services.input")
+
+-- app apis
+local newAppData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
 require(FOS_RELATIVE_PATH..".libraries.textureAPI")
 
 -- apps amount
@@ -82,10 +86,13 @@ function APP.begin(name, display_name)
         return error("Can't create app second time", 2)
     end
 
+    local id = current_app_type..":"..tostring(name)
+
     local app = {
-        id = current_app_type..":"..tostring(name),
+        id = id,
         display_name = tostring(display_name or name):gsub("\n", ""),
 
+        data = newAppData(id),
         events = eventManager.newEventsTable(),
         pages = {},
 

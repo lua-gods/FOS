@@ -44,7 +44,7 @@ for key, texture in pairs(textures:getTextures()) do
       
       local font_namespace = tex_name:sub(#SYSTEM_REGISTRY.font_texture_prefix+1,#tex_name)
       
-      config:setName(SYSTEM_REGISTRY.system_name..".".."fontcache")
+      config:setName(SYSTEM_REGISTRY.system_name..".fontcache")
       local cache = config:load(font_namespace)
       
       if cache and cache.VERSION == font_version then
@@ -52,7 +52,7 @@ for key, texture in pairs(textures:getTextures()) do
       else
          local font_package = font_manager:renderFont(texture)
          fonts[tex_name:sub(#SYSTEM_REGISTRY.font_texture_prefix+1,#tex_name)] = font_package
-         config:setName(SYSTEM_REGISTRY.system_name..".".."fontcache")
+         config:setName(SYSTEM_REGISTRY.system_name..".fontcache")
          config:save(font_namespace,font_package)
       end
    end
