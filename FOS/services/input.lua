@@ -58,7 +58,7 @@ function press(key)
         end
     elseif key == "ENTER" then
         if page[currently_selected] and type(page[currently_selected].pressAction) == "function" then
-            page[currently_selected].pressAction()
+            page[currently_selected].pressAction(page[currently_selected], currently_selected)
             play_sound = true
         end
     elseif key == "BACK" then
