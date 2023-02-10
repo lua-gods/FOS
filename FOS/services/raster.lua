@@ -42,32 +42,41 @@ local function setPixel(x, y, rgba)
 end
 
 local function fillPixels(x, y, width, height, color)
-   current_screen:fill(x, y, width, height, color)
+   if width + x > draw_area.x and height + y > draw_area.y then
+      current_screen:fill(
+         math.max(x, draw_area.x),
+         math.max(y, draw_area.y),
+         math.min(width, draw_area.z - x),
+         math.min(height, draw_area.w - y),
+         color
+      )
+   end
 end
 
 -- get render size of something --
 local render_size = {
-   text = function(obj, newline_split)
-      if newline_split then
-         return nil
-      end
-
+   text = function(obj)
       local font = "minimojangles"
+
       local pos = obj.pos or vec(0, 0)
+      local size = obj.size or 1
       local text = tostring(obj.text)
-      local x, y = 0, fontManager.fonts[font]["\n"].newline_height
+
+      local max_x = 0
+      local x, y = 0, fontManager.fonts[font]["\n"].newline_height * size
       for i = 1, #text do
          local data = fontManager.fonts[font][text:sub(i, i)]
          if data then
             if data.newline_height then
-               x, y = 0, y + data.newline_height
+               max_x = math.max(x, max_x)
+               x, y = 0, y + data.newline_height * size
             else
-               x = x + data.width
+               x = x + data.width * size
             end
          end
       end
 
-      return vec(pos.x, pos.y, x, y)
+      return vec(pos.x, pos.y, math.max(x, max_x), y)
    end,
    texture = function(obj)
       if obj.texture == nil then
@@ -89,23 +98,27 @@ local render_size = {
 local draw_functions = {
    text = function(obj, color, select_color)
       local font = "minimojangles"
+
       local render_pos = obj.pos or vec(0, 0)
       local text = tostring(obj.text)
+      local size = obj.size or 1
+
+      local pixel_size = math.ceil(size)
    
       local x, y = 0, 0
-      local font_height = fontManager.fonts[font]["\n"].newline_height
+      local font_height = fontManager.fonts[font]["\n"].newline_height * size
       for i = 1, #text do
          local data = fontManager.fonts[font][text:sub(i, i)]
          if data then
             if data.newline_height then
                x, y = 0, y + font_height
             else
-               if render_pos.x + x + data.width >= draw_area.x and render_pos.x + x < draw_area.z and render_pos.y >= draw_area.y and render_pos.y + font_height <= draw_area.w then
+               if render_pos.x + x + data.width * size >= draw_area.x and render_pos.x + x < draw_area.z and render_pos.y + y  + font_height >= draw_area.y and render_pos.y + y <= draw_area.w then
                   for _, pos in ipairs(data.bitmap) do
-                     setPixel(render_pos.x + pos.x + x, render_pos.y + pos.y + y, color)
+                     fillPixels(render_pos.x + x + pos.x * size, render_pos.y + y + pos.y * size, pixel_size, pixel_size, color)
                   end
                end
-               x = x + data.width
+               x = x + data.width * size
             end
          end
       end
@@ -185,6 +198,8 @@ function raster.draw(elements)
       draw_area.x, draw_area.y, draw_area.z - draw_area.x, draw_area.w - draw_area.y,
       themeManager.readColor()
    )
+
+   -- current_screen:applyFunc(0, 0, screen_size.x, screen_size.y, function(c) return math.lerp(c, vec(0.5, 0.5, 0.5, 1), 0.1) end)
 
    for i, v in ipairs(page) do
       local isSelected = v.pressAction and i == APP.app.selected_item
