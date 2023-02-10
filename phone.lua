@@ -9,7 +9,7 @@ local config = {
       },
       first_person = {
          pivot = vectors.vec3(4, 22, 0),
-         offset = vectors.vec3(8, -1, -8),
+         offset = vectors.vec3(9, -1, -9),
          rotation = vectors.vec3(-120, -60, 0),
          scale = vectors.vec3(0.8, 0.8, 0.8),
       }

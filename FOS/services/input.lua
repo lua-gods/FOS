@@ -74,9 +74,12 @@ function press(key)
         APP.app.selected_item = new_selected
         raster.draw({currently_selected, new_selected})
     end
+
     if play_sound then
         sounds:playSound("ui.button.click", player:getPos(), 0.25, 2)
     end
+
+    eventsManager.runEvent("POST_KEY_PRESS", key)
 end
 
 function input.isPressed(key)

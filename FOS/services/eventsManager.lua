@@ -6,6 +6,7 @@ function eventsManager.newEventsTable()
 
     tbl.INIT = KattEventAPI.newEvent()
     tbl.KEY_PRESS = KattEventAPI.newEvent()
+    tbl.POST_KEY_PRESS = KattEventAPI.newEvent()
     tbl.TICK = KattEventAPI.newEvent()
     tbl.RENDER = KattEventAPI.newEvent()
 
