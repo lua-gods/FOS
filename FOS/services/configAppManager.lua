@@ -61,9 +61,11 @@ function configAppManager.uninstall(id)
     local app = APP.apps[id]
     for i, v in ipairs(APP.sorted_apps) do
         if v == id then
-            APP.sorted_apps[i] = nil
+            table.remove(APP.sorted_apps, i)
+            break
         end
     end
+    APP.loaded_apps[app.path] = nil
     configAppManager.apps[app.path] = nil
     config:save("apps", configAppManager.apps)
 end

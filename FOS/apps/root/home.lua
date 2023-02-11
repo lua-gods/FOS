@@ -2,7 +2,7 @@ local app = APP.begin("home", "fos home screen")
 
 local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 
-app.hide_on_home = true -- hide on home screen
+app.can_be_opened = false -- hide on home screen
 
 local wallpaper_light = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88+AAAAAXNSR0IArs4c6QAAABtQTFRFAAAA0/x+AAAA/+tX////meZfM5hLWsVPHm9QOO7O5AAAAAl0Uk5T//8A////////7HvdrwAAAFRJREFUCJlNilEWADEEA+OVxP1PvKqrr/lghgBv7AlsrVpu7lc2u51aTM2MFjFCMkItNYtDOkJmmwRVawxS5s+cz+aSeinUN3BL45abTFyqIIdannxAjwPk4AOkqQAAAABJRU5ErkJggg")
 local wallpaper_dark = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88+AAAAAXNSR0IArs4c6QAAABhQTFRFAAAADgcbAAAAGhky////Ki9OZXOSQkxuy6cUJwAAAAh0Uk5T//8A//////8XRfkYAAAAU0lEQVQImU2KAQ4AQQQDSbf6/x8f9sg2ITPU7I0DPjGck0YnV4rptxZ/LUceMSIyQi25k0O6QqJNsiytmQT8zPkUp+RLob4ZSxpLNoAtZQxDLU8+OqUDMI8q6tYAAAAASUVORK5CYII")
@@ -57,7 +57,7 @@ function page_main()
     local y = 8*2
     for _, name in pairs(APP.sorted_apps) do
         local data = APP.apps[name]
-        if not data.hide_on_home then
+        if data.can_be_opened then
             table.insert(
                 app.pages.main,
                 {

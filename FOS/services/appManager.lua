@@ -1,7 +1,8 @@
 APP = {
     app = nil,
     apps = {},
-    sorted_apps = {}
+    sorted_apps = {},
+    loaded_apps = {}
 }
 
 -- app manager apis
@@ -12,7 +13,7 @@ local raster = require(FOS_RELATIVE_PATH..".services.raster")
 local input = require(FOS_RELATIVE_PATH..".services.input")
 
 -- app apis
-local newAppData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
+local appData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
 require(FOS_RELATIVE_PATH..".libraries.textureAPI")
 
 -- apps amount
@@ -21,16 +22,14 @@ local loaded_apps_count = 0
 
 
 -- list of apps (to not install app twice)
-local loaded_apps = {}
-
 -- load app
 local current_app_type
 local function loadApp(path, app_type)
     -- prevent installing app twice
-    if loaded_apps[path] then
+    if APP.loaded_apps[path] then
         return
     end
-    loaded_apps[path] = true
+    APP.loaded_apps[path] = true
 
     
     apps_count = apps_count + 1
@@ -120,7 +119,7 @@ function APP.begin(name, display_name)
         id = id,
         display_name = tostring(display_name or name):gsub("\n", ""),
 
-        data = newAppData(id),
+        data = appData.new(id),
         events = eventManager.newEventsTable(),
         pages = {},
 
@@ -131,7 +130,7 @@ function APP.begin(name, display_name)
         current_page = nil,
         selected_item = -1,
 
-        hide_on_home = false,
+        can_be_opened = true,
     }
 
     APP.app = app

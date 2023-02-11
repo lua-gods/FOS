@@ -215,7 +215,7 @@ function raster.draw(elements)
          draw_functions[v.type](
             v,
             themeManager.readColor(v.color, v.type),
-            isSelected and themeManager.readColor(v.color, v.type.."_select")
+            isSelected and themeManager.readColor(v.select_color, v.type.."_select")
          )
       end
    end

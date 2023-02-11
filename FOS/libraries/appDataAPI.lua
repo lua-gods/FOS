@@ -1,3 +1,5 @@
+local appData = {}
+
 local tblToID = {}
 
 local function saveData(tbl, i, v)
@@ -9,7 +11,7 @@ local function saveData(tbl, i, v)
     config:save(tblToID[tbl], tbl)
 end
 
-local function newAppData(id)
+function appData.new(id)
     config:setName(SYSTEM_REGISTRY.system_name..".apps_data")
     local tbl = config:load(id)
     
@@ -24,4 +26,11 @@ local function newAppData(id)
     return tbl
 end
 
-return newAppData
+function appData.clear(id)
+    config:setName(SYSTEM_REGISTRY.system_name..".apps_data")
+    config:save(id, nil)
+
+    APP.apps[id].data = appData.new(id)
+end
+
+return appData

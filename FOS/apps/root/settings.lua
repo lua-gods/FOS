@@ -1,9 +1,6 @@
 local app = APP.begin("settings", "settings")
 
-SYSTEM_REGISTRY.home_app = "root:settings"
--- SYSTEM_REGISTRY.home_app = "root:home"
-
----- functions --
+---- functions ----
 local function setPage(page, ...)
     if app.pages[page].load then
         app.pages[page].load(app.pages[page], ...) 
@@ -12,20 +9,27 @@ local function setPage(page, ...)
     app.setPage(page)
 end
 
-function app.events.key_press(key)
-    if key == "LEFT" then
-        local page = app.current_page
-        local new_page = page:match("^(.*)%.[^.]*$")
-        if new_page then
-            setPage(new_page)
-        else
-            APP.open()
-        end
+local function goPageBack()
+    local page = app.current_page
+    local new_page = page:match("^(.*)%.[^.]*$")
+    if new_page then
+        setPage(new_page)
+    else
+        APP.open()
     end
 end
 
----- pages --
+function app.events.key_press(key)
+    if key == "LEFT" then
+        goPageBack()
+    end
+end
+
+---- services ----
 local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
+local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
+local appData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
+---- pages ----
 
 app.pages["main"] = {
     {type = "rectangle", size = vec(96, 8)},
@@ -38,7 +42,6 @@ app.pages["main"] = {
 app.pages["main.personalization"] = {
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = "personalization"},
-    {type = "text", text = "locked", pos = vec(0, 8*4), color = "text_locked"},
 
     {
         type = "text", pos = vec(0, 8 * 2),
@@ -124,18 +127,82 @@ do
 end
 
 -- app settings tab
-app.pages["main.apps.app"] = {
-    load = function(page, selected_app_id)
-        local selected_app = APP.apps[selected_app_id]
+do
+    local selected_app
+    local data_can_be_cleared = true
+    local already_exported = false
+    app.pages["main.apps.app"] = {
+        load = function(page, selected_app_id)
+            if not selected_app_id then
+                return
+            end
+            selected_app = APP.apps[selected_app_id]
 
-        page[2].text = selected_app.display_name
+            -- variables
+            data_can_be_cleared = true
+            already_exported = false
 
-        page[3].text = "id:\n"..selected_app_id
+            -- info
+            page[2].text = selected_app.display_name
+            page[3].text = "id:\n"..selected_app_id
+            page[4].text = "path:\n"..selected_app.path
 
-        page[4].text = "path:\n"..selected_app.path
-    end,
-    {type = "rectangle", size = vec(96, 8)},
-    {type = "text", text = "apps"},
-    {type = "text", text = "id", pos = vec(0, 8 * 2)},
-    {type = "text", text = "path", pos = vec(0, 8 * 5), wrap_after = 96},
-}
+            -- options
+            page[6].color = selected_app.can_be_opened and "text" or "text_locked"
+            page[7].color = configAppManager.exportable[selected_app_id] and "text" or "text_locked"
+            page[8].color = "text"
+            page[9].color = selected_app.path:sub(1, 7) == "CONFIG." and "text" or "text_locked"
+        end,
+        {type = "rectangle", size = vec(96, 8)},
+        {type = "text", text = "app name"},
+        {type = "text", text = "id", pos = vec(0, 8 * 2)},
+        {type = "text", text = "path", pos = vec(0, 8 * 5), wrap_after = 96},
+
+        {type = "rectangle", size = vec(96, 32), pos = vec(0, 112)},
+        {type = "text", text = "open", pos = vec(0, 112),
+            pressAction = function()
+                if selected_app.can_be_opened then
+                    APP.open(selected_app.id)
+                end
+            end
+        },
+        {type = "text", text = "export", pos = vec(0, 120), pressAction = function(obj, i)
+                if configAppManager.exportable[selected_app.id] and not already_exported then
+                    configAppManager.export(selected_app.id)
+                    already_exported = true
+                    obj.color = "text_locked"
+                    app.redraw({i})
+                end
+            end
+        },
+        {type = "text", text = "clear app data", pos = vec(0, 128), pressAction = function(obj, i)
+                if data_can_be_cleared then
+                    appData.clear(selected_app.id)
+                    data_can_be_cleared = false
+                    obj.color = "text_locked"
+                    app.redraw({i})
+                end
+            end
+        },
+        {type = "text", text = "uninstall", pos = vec(0, 136), pressAction = function()
+                if selected_app.path:sub(1, 7) == "CONFIG." then
+                    setPage("main.apps.app.uninstall_confirm")
+                end
+            end
+        },
+    }
+
+    app.pages["main.apps.app.uninstall_confirm"] = {
+        load = function(page)
+            page[2].text = selected_app.display_name
+        end,
+        {type = "rectangle", size = vec(96, 8)},
+        {type = "text", text = "app name"},
+
+        {type = "text", text = "are you sure you\nwant to uninstall\nthis app?", pos = vec(0,16)},
+
+        {type = "rectangle", size = vec(96, 16), pos = vec(0, 128)},
+        {type = "text", text = "yes", pos = vec(0, 128), pressAction = function() configAppManager.uninstall(selected_app.id) setPage("main.apps") end},
+        {type = "text", text = "no", pos = vec(0, 136), pressAction = function() goPageBack() end},
+    }
+end
