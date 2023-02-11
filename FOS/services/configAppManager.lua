@@ -55,6 +55,20 @@ function configAppManager.ignore_install()
     end
 end
 
+-- uninstall
+function configAppManager.uninstall(id)    
+    config:setName(SYSTEM_REGISTRY.system_name..".apps")
+    local app = APP.apps[id]
+    for i, v in ipairs(APP.sorted_apps) do
+        if v == id then
+            APP.sorted_apps[i] = nil
+        end
+    end
+    configAppManager.apps[app.path] = nil
+    config:save("apps", configAppManager.apps)
+end
+
+-- allow to install
 config:setName(SYSTEM_REGISTRY.system_name..".exported_app")
 local import_app = config:load("app")
 local import_app_name = config:load("app_name")

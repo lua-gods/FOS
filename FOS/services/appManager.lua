@@ -1,6 +1,7 @@
 APP = {
     app = nil,
-    apps = {}
+    apps = {},
+    sorted_apps = {}
 }
 
 -- app manager apis
@@ -77,7 +78,34 @@ local function loadApp(path, app_type)
 
     -- app loaded
     loaded_apps_count = loaded_apps_count + 1
-    -- print("app loaded", path, app_type, APP.apps[APP.app.id])
+
+    APP.app.path = path
+
+    APP.apps[APP.app.id] = APP.app
+
+    -- table.insert(APP.sorted_apps, "")
+
+    local id = APP.app.id
+    local display_name = APP.app.display_name
+    local can_insert = true
+
+    local min, max = 1, #APP.sorted_apps
+    while min <= max do
+        local middle = math.floor((min + max) / 2)
+        local middle_app_name = APP.apps[APP.sorted_apps[middle]].display_name
+        if middle_app_name < display_name then
+            min = middle + 1
+        elseif middle_app_name > display_name then
+            max = middle - 1
+        else
+            can_insert = false
+            break
+        end
+    end
+
+    if can_insert then
+        table.insert(APP.sorted_apps, min, id)
+    end
 end
 
 -- begin function for apps
@@ -106,7 +134,6 @@ function APP.begin(name, display_name)
         hide_on_home = false,
     }
 
-    APP.apps[app.id] = app
     APP.app = app
     return APP.app
 end
@@ -117,7 +144,7 @@ function APP.open(name)
     local app_to_load = APP.apps[name] 
     if app_to_load == nil then
         if type(name) == "string" then
-            app_to_load = APP.apps["root."..name] or APP.apps["user."..name]
+            app_to_load = APP.apps["root:"..name] or APP.apps["user:"..name]
         else
             app_to_load = APP.apps[SYSTEM_REGISTRY.home_app]
         end

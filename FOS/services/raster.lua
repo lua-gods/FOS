@@ -61,6 +61,7 @@ local render_size = {
       local pos = obj.pos or vec(0, 0)
       local size = obj.size or 1
       local text = tostring(obj.text)
+      local wrap_after = obj.wrap_after or math.huge
 
       local max_x = 0
       local x, y = 0, fontManager.fonts[font]["\n"].newline_height * size
@@ -70,6 +71,9 @@ local render_size = {
             if data.newline_height then
                max_x = math.max(x, max_x)
                x, y = 0, y + data.newline_height * size
+            elseif x + data.width >= wrap_after then
+               max_x = math.max(x, max_x)
+               x, y = data.width * size, y + data.newline_height * size
             else
                x = x + data.width * size
             end
@@ -102,6 +106,7 @@ local draw_functions = {
       local render_pos = obj.pos or vec(0, 0)
       local text = tostring(obj.text)
       local size = obj.size or 1
+      local wrap_after = obj.wrap_after or math.huge
 
       local pixel_size = math.ceil(size)
    
@@ -113,6 +118,9 @@ local draw_functions = {
             if data.newline_height then
                x, y = 0, y + font_height
             else
+               if x + data.width >= wrap_after then
+                  x, y = 0, y + font_height
+               end 
                if render_pos.x + x + data.width * size >= draw_area.x and render_pos.x + x < draw_area.z and render_pos.y + y  + font_height >= draw_area.y and render_pos.y + y <= draw_area.w then
                   for _, pos in ipairs(data.bitmap) do
                      fillPixels(render_pos.x + x + pos.x * size, render_pos.y + y + pos.y * size, pixel_size, pixel_size, color)

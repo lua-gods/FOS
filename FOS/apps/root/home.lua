@@ -55,7 +55,8 @@ function page_main()
     app.pages.main[1].texture = PUBLIC_REGISTRY.theme == "dark" and wallpaper_dark or wallpaper_light
 
     local y = 8*2
-    for name, data in pairs(APP.apps) do
+    for _, name in pairs(APP.sorted_apps) do
+        local data = APP.apps[name]
         if not data.hide_on_home then
             table.insert(
                 app.pages.main,
