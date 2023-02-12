@@ -44,7 +44,7 @@ function themeManager.readColor(color, obj)
         return color
     elseif type(color) == "string" then
         if color:match("%.") then
-            local theme_name, color_name = color:match("^.*%..*$")
+            local theme_name, color_name = color:match("^(.*)%.(.*)$")
             return themes[theme_name] and themes[theme_name][color_name] or themes.default.background
         else
             return themes.default[color] or themes.default.background
