@@ -1,4 +1,5 @@
 models.FOS.phone.base.screen:setPrimaryRenderType("EMISSIVE_SOLID")
+
 local config = {
    portrait = {
       third_person = {
@@ -65,10 +66,24 @@ if not host:isHost() then return end
 
 events.RENDER:register(function(dt, context)
    local orientation = APP and APP.landscapeMode() and "landscape" or "portrait"
-   if context == "FIRST_PERSON" then
-      applyTransformPreset(config[orientation].first_person)
-   elseif context == "RENDER" or context == "FIGURA_GUI" or context == "MINECRAFT_GUI" then
-      applyTransformPreset(config[orientation].third_person)
+
+   local render_type = nil
+   if client.hasIrisShader() then
+      if context == "FIRST_PERSON" or context == "OTHER" then
+         render_type = 1
+      else
+         render_type = 0
+      end
+   else
+      if context == "FIRST_PERSON" then
+         render_type = 1
+      else
+         render_type = 0
+      end
+   end
+
+   if render_type then
+      applyTransformPreset(config[orientation][render_type == 1 and "first_person" or "third_person"])
    end
 end)
 
