@@ -9,7 +9,7 @@ local key_names = {
     ["key.keyboard.right"] = "RIGHT",
     ["key.keyboard.down"] = "DOWN",
     ["key.keyboard.enter"] = "ENTER",
-["key.keyboard.backspace"] = "BACK",
+    ["key.keyboard.backspace"] = "BACK",
 }
 
 local go_to_home_time = 0
