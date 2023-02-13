@@ -1,6 +1,6 @@
 local app = APP.begin("calculator", "calculator")
 
-SYSTEM_REGISTRY.home_app = "user:calculator"
+-- SYSTEM_REGISTRY.home_app = "user:calculator"
 
 app.pages.main = {
     {type = "rectangle", size = vec(96, 8)},
