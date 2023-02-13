@@ -25,14 +25,12 @@ function events.tick()
     eventsManager.runEvent("TICK")
 end
 
-function events.render(delta, context)
+function events.world_render(delta)
     if SYSTEM_REGISTRY.disable_system then
         return
     end
 
-    if context == "FIRST_PERSON" or context == "RENDER" then
-        eventsManager.runEvent("RENDER", delta)
-    end
+    eventsManager.runEvent("RENDER", delta)
 end
 
 return eventsManager
