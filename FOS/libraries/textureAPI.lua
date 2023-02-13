@@ -57,10 +57,18 @@ end
 function texture_api:applyFunc(x, y, w, h, func)
     for pos_x = x, x + w - 1 do
         for pos_y = y, y + h - 1 do
-            local c = func(x, y, self:getPixel(x, y))
+            local c = func(pos_x, pos_y, self:getPixel(pos_x, pos_y))
             if c then
                 self:setPixel(c, pos_x, pos_y)
             end
+        end
+    end
+end
+
+function texture_api:fill(x, y, w, h, color)
+    for pos_x = x, x + w - 1 do
+        for pos_y = y, y + h - 1 do
+            self:setPixel(pos_x, pos_y, color)
         end
     end
 end
