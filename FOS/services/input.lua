@@ -12,7 +12,6 @@ local key_names = {
 ["key.keyboard.backspace"] = "BACK",
 }
 
-local can_press_keys = 0 -- 0 is true, 1 and above if false
 local go_to_home_time = 0
 
 local keys = {}
@@ -22,7 +21,7 @@ for key_path, display_name in pairs(key_names) do
     local key = keybinds:newKeybind(display_name:lower(), key_path)
 
     key.press = function()
-        press(display_name)
+        return press(display_name)
     end
 
     keys[display_name] = key
@@ -30,8 +29,8 @@ end
 
 
 function press(key)
-    if can_press_keys >= 1 then
-        return
+    if SYSTEM_REGISTRY.disable_system then
+        return false
     end
 
     local play_sound = false
@@ -80,6 +79,8 @@ function press(key)
     end
 
     eventsManager.runEvent("POST_KEY_PRESS", key)
+
+    return true
 end
 
 function input.isPressed(key)
@@ -90,14 +91,6 @@ end
 
 function events.tick()
     go_to_home_time = math.max(go_to_home_time - 1, 0)
-
-    can_press_keys = math.max(can_press_keys - 1, 0)
-
-    if player:getItem(1).id ~= "minecraft:air" then
-        can_press_keys = 2
-    elseif host:isChatOpen() then
-        can_press_keys = 2
-    end
 end
 
 return input

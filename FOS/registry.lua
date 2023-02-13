@@ -19,6 +19,7 @@ SYSTEM_REGISTRY = {
    },
    screen_model = models.FOS.phone.base.screen,
    home_app = "root:home",
+   disable_system = false, -- enabled when FOS is in pocket
 }
 
 PUBLIC_REGISTRY = { -- default values, public registry is loaded in registry manager

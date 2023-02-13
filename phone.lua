@@ -87,4 +87,32 @@ events.RENDER:register(function(dt, context)
    end
 end)
 
+local in_pocket = false
+events.TICK:register(function()
+   if not SYSTEM_REGISTRY then
+      return
+   end
+   
+   SYSTEM_REGISTRY.disable_system = false
+   local hide_model = false
+
+   if in_pocket then
+      SYSTEM_REGISTRY.disable_system = true
+      hide_model = true
+   elseif player:getItem(1).id ~= "minecraft:air" then
+      SYSTEM_REGISTRY.disable_system = true
+      hide_model = true
+   elseif host:isChatOpen() then
+      SYSTEM_REGISTRY.disable_system = true
+   end
+
+   models.FOS:setVisible(not hide_model)
+end)
+
+keybinds:newKeybind("put in pocket", keybinds:getVanillaKey("figura.config.action_wheel_button")).press = function()
+   in_pocket = not in_pocket
+   print(in_pocket and "FOS is now in pocket" or "FOS in now in hand")
+   return true
+end
+
 local os = require("FOS.OS")

@@ -134,8 +134,12 @@ do
     app.pages["main.apps.app"] = {
         load = function(page, selected_app_id)
             if not selected_app_id then
+                -- lock option
+                page[8].color = data_can_be_cleared and "text" or "text_locked"
+                --return
                 return
             end
+
             selected_app = APP.apps[selected_app_id]
 
             -- variables
@@ -147,10 +151,10 @@ do
             page[3].text = "id:\n"..selected_app_id
             page[4].text = "path:\n"..selected_app.path
 
-            -- options
+            -- lock options
             page[6].color = selected_app.can_be_opened and "text" or "text_locked"
             page[7].color = configAppManager.exportable[selected_app_id] and "text" or "text_locked"
-            page[8].color = "text"
+            page[8].color = data_can_be_cleared and "text" or "text_locked"
             page[9].color = selected_app.path:sub(1, 7) == "CONFIG." and "text" or "text_locked"
         end,
         {type = "rectangle", size = vec(96, 8)},
@@ -177,10 +181,7 @@ do
         },
         {type = "text", text = "clear app data", pos = vec(0, 128), pressAction = function(obj, i)
                 if data_can_be_cleared then
-                    appData.clear(selected_app.id)
-                    data_can_be_cleared = false
-                    obj.color = "text_locked"
-                    app.redraw({i})
+                    setPage("main.apps.app.clear_data_confirm")
                 end
             end
         },
@@ -203,6 +204,24 @@ do
 
         {type = "rectangle", size = vec(96, 16), pos = vec(0, 128)},
         {type = "text", text = "yes", pos = vec(0, 128), pressAction = function() configAppManager.uninstall(selected_app.id) setPage("main.apps") end},
+        {type = "text", text = "no", pos = vec(0, 136), pressAction = function() goPageBack() end},
+    }
+
+    app.pages["main.apps.app.clear_data_confirm"] = {
+        load = function(page)
+            page[2].text = selected_app.display_name
+        end,
+        {type = "rectangle", size = vec(96, 8)},
+        {type = "text", text = "app name"},
+
+        {type = "text", text = "are you sure you\nwant to clear data\nof this app?", pos = vec(0,16)},
+
+        {type = "rectangle", size = vec(96, 16), pos = vec(0, 128)},
+        {type = "text", text = "yes", pos = vec(0, 128), pressAction = function()
+            appData.clear(selected_app.id)
+            data_can_be_cleared = false
+            setPage("main.apps.app")
+        end},
         {type = "text", text = "no", pos = vec(0, 136), pressAction = function() goPageBack() end},
     }
 end

@@ -18,10 +18,18 @@ function eventsManager.runEvent(event_name, ...)
 end
 
 function events.tick()
+    if SYSTEM_REGISTRY.disable_system then
+        return
+    end
+
     eventsManager.runEvent("TICK")
 end
 
 function events.render(delta, context)
+    if SYSTEM_REGISTRY.disable_system then
+        return
+    end
+
     if context == "FIRST_PERSON" or context == "RENDER" then
         eventsManager.runEvent("RENDER", delta)
     end
