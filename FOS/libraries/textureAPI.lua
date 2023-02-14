@@ -1,7 +1,7 @@
 -- purpose: custom texture api because there is not enough textures
 texture = {}
 local texture_api = {}
-local fallback_color = vec(0.5, 0.75, 1, 1)
+local fallback_color = vec(0, 0, 0, 1)
 
 local texture_metatable = {
     __metatable = false,

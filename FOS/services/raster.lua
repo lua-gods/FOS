@@ -95,6 +95,11 @@ local render_size = {
       local pos = obj.pos or vec(0, 0)
       local size = obj.size or vec(16, 16)
       return vec(pos.x, pos.y, size.x, size.y)
+   end,
+   marker = function(obj)
+      local pos = obj.pos or vec(0, 0)
+      local size = obj.size or vec(0, 0)
+      return vec(pos.x, pos.y, size.x, size.y)
    end
 }
 
@@ -147,10 +152,10 @@ local draw_functions = {
       local dimensions = texture:getDimensions() * size
       local color_to_use = select_color or color
       
-      for x = math.max(0, draw_area.x - render_pos.x), math.min(dimensions.x - 1, draw_area.z - render_pos.x) do
-         for y = math.max(0, draw_area.y - render_pos.y), math.min(dimensions.y - 1, draw_area.w - render_pos.y) do
+      for x = math.max(0, draw_area.x - render_pos.x), math.min(dimensions.x - 1, draw_area.z - render_pos.x), size do
+         for y = math.max(0, draw_area.y - render_pos.y), math.min(dimensions.y - 1, draw_area.w - render_pos.y), size do
             local pixel = texture:getPixel(x * inverted_size, y * inverted_size)
-            setPixel(x + render_pos.x, y + render_pos.y, pixel * color_to_use)
+            fillPixels(x + render_pos.x, y + render_pos.y, size, size, pixel * color_to_use)
          end
       end
    end,
@@ -168,7 +173,8 @@ local draw_functions = {
          math.min(draw_area.w, pos.y + size.y) - y,
          select_color or color
       )
-   end
+   end,
+   marker = function() end
 }
 
 -- sets space where you can draw, used for optimization, not everything needs to be updated (mostly used for textures) --
