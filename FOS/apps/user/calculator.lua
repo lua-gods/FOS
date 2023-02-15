@@ -44,6 +44,9 @@ local tiles_data = {
     {"."},
     {"<", function() input_text_update(input_text:sub(1, -2), true) end},
     {"=", function()
+        if input_text == "error" then
+            return
+        end
         local func = loadstring("return "..input_text)
         if func then
             local success, output = pcall(func)
