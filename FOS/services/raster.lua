@@ -152,8 +152,13 @@ local draw_functions = {
       local dimensions = texture:getDimensions() * size
       local color_to_use = select_color or color
       
-      for x = math.max(0, draw_area.x - render_pos.x), math.min(dimensions.x - 1, draw_area.z - render_pos.x), size do
-         for y = math.max(0, draw_area.y - render_pos.y), math.min(dimensions.y - 1, draw_area.w - render_pos.y), size do
+      local start_x = math.floor(math.max(0, draw_area.x - render_pos.x) / size) * size
+      local start_y = math.floor(math.max(0, draw_area.y - render_pos.y) / size) * size
+      local end_x = math.min(dimensions.x - 1, draw_area.z - render_pos.x)
+      local end_y = math.min(dimensions.y - 1, draw_area.w - render_pos.y)
+
+      for x = start_x, end_x, size do
+         for y = start_y, end_y, size do
             local pixel = texture:getPixel(x * inverted_size, y * inverted_size)
             fillPixels(x + render_pos.x, y + render_pos.y, size, size, pixel * color_to_use)
          end
@@ -201,7 +206,7 @@ local function set_draw_area(page, elements)
 end
 
 -- draw screen --
-function raster.draw(elements)
+function raster.draw(elements, dont_update)
    local page = APP.app.pages[APP.app.current_page]
    
    set_screen_mode()
@@ -226,7 +231,9 @@ function raster.draw(elements)
       end
    end
 
-   current_screen:update()
+   if not dont_update then
+      current_screen:update()
+   end
 end
 
 -- return --

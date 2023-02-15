@@ -102,7 +102,7 @@ events.TICK:register(function()
    elseif player:getItem(1).id ~= "minecraft:air" then
       SYSTEM_REGISTRY.disable_system = true
       hide_model = true
-   elseif host:isChatOpen() then
+   elseif host:getScreen() then
       SYSTEM_REGISTRY.disable_system = true
    end
 

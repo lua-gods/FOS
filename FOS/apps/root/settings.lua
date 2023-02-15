@@ -317,11 +317,11 @@ do
             return
         elseif updating_at == -2 then
             updating_at = -3
-            app.redraw({1})
+            app.redraw({1}, true)
             return
         elseif updating_at == -3 then
             updating_at = -4
-            app.redraw({2})
+            app.redraw({2}, true)
             return
         elseif updating_at == -4 then
             updating_at = 0
