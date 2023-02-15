@@ -5,7 +5,7 @@ local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager"
 app.can_be_opened = false -- hide on home screen
 
 local wallpaper_light = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88+AAAAAXNSR0IArs4c6QAAABtQTFRFAAAA0/x+AAAA/+tX////meZfM5hLWsVPHm9QOO7O5AAAAAl0Uk5T//8A////////7HvdrwAAAFRJREFUCJlNilEWADEEA+OVxP1PvKqrr/lghgBv7AlsrVpu7lc2u51aTM2MFjFCMkItNYtDOkJmmwRVawxS5s+cz+aSeinUN3BL45abTFyqIIdannxAjwPk4AOkqQAAAABJRU5ErkJggg")
-local wallpaper_dark = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88+AAAAAXNSR0IArs4c6QAAABhQTFRFAAAADgcbAAAAGhky////Ki9OZXOSQkxuy6cUJwAAAAh0Uk5T//8A//////8XRfkYAAAAU0lEQVQImU2KAQ4AQQQDSbf6/x8f9sg2ITPU7I0DPjGck0YnV4rptxZ/LUceMSIyQi25k0O6QqJNsiytmQT8zPkUp+RLob4ZSxpLNoAtZQxDLU8+OqUDMI8q6tYAAAAASUVORK5CYII")
+local wallpaper_dark = texture.read("iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAMAAABYd88+AAAAAXNSR0IArs4c6QAAABhQTFRFAAAADgcbAAAAGhky2N3qKi9OZXOSQkxuuHla6gAAAAh0Uk5T//8A//////8XRfkYAAAAU0lEQVQImU2KAQ4AQQQDSbf6/x8f9sg2ITPU7I0DPjGck0YnV4rptxZ/LUceMSIyQi25k0O6QqJNsiytmQT8zPkUp+RLob4ZSxpLNoAtZQxDLU8+OqUDMI8q6tYAAAAASUVORK5CYII")
 
 -- create main page
 app.pages.main = {
@@ -28,7 +28,7 @@ app.pages.install = {
         {type = "rectangle", size = vec(SYSTEM_REGISTRY.resolution.x, 24), pos = vec(0, SYSTEM_REGISTRY.resolution.y - 24)},
     {type = "text", text = "install", pressAction = function() configAppManager.install() end, pos = vec(0, SYSTEM_REGISTRY.resolution.y - 24)},
     {type = "text", text = "don't install", pressAction = function() configAppManager.ignore_install() page_main() end, pos = vec(0, SYSTEM_REGISTRY.resolution.y - 16)},
-    {type = "text", text = "go to home", pressAction = function() page_main() end, pos = vec(0, SYSTEM_REGISTRY.resolution.y - 8)},
+    {type = "text", text = "install later", pressAction = function() page_main() end, pos = vec(0, SYSTEM_REGISTRY.resolution.y - 8)},
 }
 
 local elements_count = #app.pages.main -- needed to know where its safe to remove elements from list
