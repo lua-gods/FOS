@@ -2,7 +2,7 @@
 
 -- variables --
 local fontManager = require(FOS_RELATIVE_PATH..".services.fontManager")
-local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
+local themeManager = require(FOS_RELATIVE_PATH..".services.themeManager")
 local raster = {}
 local draw_area = vec(0, 0, 0, 0) -- limit drawing
 

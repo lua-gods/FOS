@@ -26,7 +26,7 @@ function app.events.key_press(key)
 end
 
 ---- services ----
-local themeManager = require(FOS_RELATIVE_PATH..".services.ThemeManager")
+local themeManager = require(FOS_RELATIVE_PATH..".services.themeManager")
 local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 local appData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
 ---- pages ----

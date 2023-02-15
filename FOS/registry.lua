@@ -6,11 +6,9 @@ SYSTEM_REGISTRY = {
    services = { -- a list of things that gets called as the FOS boots up, order from top to bottom
       "registryManager",
 
-      "AppDevelopmentKit",
-
       "fontManager",
       "eventsManager",
-      "ThemeManager",
+      "themeManager",
       "input",
       "raster",
       "configAppManager",
