@@ -64,6 +64,7 @@ end)
 
 if not host:isHost() then return end
 
+-- transform
 events.RENDER:register(function(dt, context)
    local orientation = APP and APP.landscapeMode() and "landscape" or "portrait"
 
@@ -87,6 +88,7 @@ events.RENDER:register(function(dt, context)
    end
 end)
 
+-- pocket
 local in_pocket = false
 events.TICK:register(function()
    if not SYSTEM_REGISTRY then
@@ -109,10 +111,15 @@ events.TICK:register(function()
    models.FOS:setVisible(not hide_model)
 end)
 
+local f3_key = keybinds:newKeybind("f3 key", "key.keyboard.f3")
+
 keybinds:newKeybind("put in pocket", keybinds:getVanillaKey("figura.config.action_wheel_button")).press = function()
-   in_pocket = not in_pocket
-   print(in_pocket and "FOS is now in pocket" or "FOS in now in hand")
-   return true
+   if not f3_key:isPressed() then
+      in_pocket = not in_pocket
+      print(in_pocket and "FOS is now in pocket" or "FOS in now in hand")
+      return true
+   end
 end
 
+-- load OS
 local os = require("FOS.OS")

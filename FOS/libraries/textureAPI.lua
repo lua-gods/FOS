@@ -78,7 +78,7 @@ function texture_api:save()
 
     for x = 0, self.width - 1 do
         for y = 0, self.height - 1 do
-            texture:setPixel(x, y)
+            texture:setPixel(x, y, self:getPixel(x, y))
         end
     end
 
