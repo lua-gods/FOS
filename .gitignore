@@ -1,4 +1,5 @@
 .vscode
 FOS.code-workspace
 .luarc.json
+.install.bat
 gn/*
