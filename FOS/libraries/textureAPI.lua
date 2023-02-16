@@ -23,7 +23,7 @@ local function texture_reader(color, x, y)
 end
 
 function texture.read(base64)
-    local readed_texture = textures:read("texture_reader", base64) -- im not going to make base64 reader ok? we got figura already
+    local readed_texture = textures:read("base64_texture_converter", base64) -- im not going to make base64 reader ok? we got figura already
     local dimensions = readed_texture:getDimensions()
     local texture = texture.newTexture(dimensions.x, dimensions.y)
 
@@ -71,4 +71,28 @@ function texture_api:fill(x, y, w, h, color)
             self:setPixel(pos_x, pos_y, color)
         end
     end
+end
+
+function texture_api:save()
+    local texture = textures:newTexture("base64_texture_converter", self.width, self.height)
+
+    for x = 0, self.width - 1 do
+        for y = 0, self.height - 1 do
+            texture:setPixel(x, y)
+        end
+    end
+
+    return texture:save()
+end
+
+function texture_api:copy()
+    local texture = texture.newTexture(self.width, self.height)
+
+    for i, v in pairs(self) do
+        if type(i) == "number" then
+            texture[i] = v:copy()
+        end
+    end
+
+    return texture
 end

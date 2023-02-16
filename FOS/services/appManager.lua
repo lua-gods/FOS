@@ -14,6 +14,7 @@ local input = require(FOS_RELATIVE_PATH..".services.input")
 
 -- app apis
 local appData = require(FOS_RELATIVE_PATH..".libraries.appDataAPI")
+require(FOS_RELATIVE_PATH..".libraries.fileSystemAPI")
 require(FOS_RELATIVE_PATH..".libraries.textureAPI")
 
 -- apps amount
@@ -139,7 +140,7 @@ end
 
 
 -- open app
-function APP.open(name)
+function APP.open(name, ...)
     local app_to_load = APP.apps[name] 
     if app_to_load == nil then
         if type(name) == "string" then
@@ -157,7 +158,7 @@ function APP.open(name)
 
     APP.app.current_page = nil
 
-    eventManager.runEvent("INIT")
+    eventManager.runEvent("INIT", ...)
 
     if APP.app.current_page == nil then
         appManager.setPage()
