@@ -36,7 +36,7 @@ function app.events.key_press(key)
     end
 end
 
-function app.events.render(delta)
+function app.events.render()
     screen_texture = host:screenshot("CAMERA")
 end
 
