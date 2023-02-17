@@ -155,10 +155,11 @@ local draw_functions = {
       local end_x = math.min(dimensions.x - 1, draw_area.z - render_pos.x)
       local end_y = math.min(dimensions.y - 1, draw_area.w - render_pos.y)
 
-      for x = start_x, end_x, size do
-         for y = start_y, end_y, size do
+      local pixel_size = math.ceil(size)
+      for x = start_x, end_x, math.max(size, 1) do
+         for y = start_y, end_y, math.max(size, 1) do
             local pixel = texture:getPixel(x * inverted_size, y * inverted_size)
-            fillPixels(x + render_pos.x, y + render_pos.y, size, size, pixel * color_to_use)
+            fillPixels(math.floor(x + render_pos.x), math.floor(y + render_pos.y), pixel_size, pixel_size, pixel * color_to_use)
          end
       end
    end,

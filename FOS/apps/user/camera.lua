@@ -126,7 +126,7 @@ function app.events.tick()
             set_toast("took photo", 20)
 
             local date = client:getDate()
-            local file_name = string.format("photo-%s-%s-%s-%s-%s-%s", date.second, date.minute, date.hour, date.day, date.month, date.year)
+            local file_name = string.format("photo-%s-%s-%s-%s-%s-%s", date.year, date.month, date.day, date.hour, date.minute, date.second)
             if fileSystem.photos == nil then
                 fileSystem.photos = {}
             end
