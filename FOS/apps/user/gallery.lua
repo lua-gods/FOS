@@ -9,13 +9,20 @@ app.pages.empty = {}
 
 app.pages.image_tile = {
     {type = "texture"},
-    -- {type = "rectangle", color = vec(1, 1, 1, 1), size = vec(96, 144)},
     [-1] = {type = "marker", pos = vec(1, 0), size = vec(46, 46)},
     [-2] = {type = "marker", pos = vec(48 + 1, 0), size = vec(46, 46)},
     [-3] = {type = "marker", pos = vec(1, 0), size = vec(46, 46)},
     [-4] = {type = "marker", pos = vec(48 + 1, 0), size = vec(46, 46)},
     [-5] = {type = "marker", pos = vec(1, 0), size = vec(46, 46)},
     [-6] = {type = "marker", pos = vec(48 + 1, 0), size = vec(46, 46)},
+}
+
+app.pages.selected_photo = {{type = "rectangle", color = "text"}}
+local selected_photo_lines = {
+    vec(0, 0, 1, 46),
+    vec(45, 0, 1, 46),
+    vec(1, 0, 44, 1),
+    vec(1, 45, 44, 1),
 }
 
 local pos = vec(0, 0)
@@ -40,10 +47,7 @@ end
 local function render_gallery()
     app.current_page = "empty"
     app.redraw(nil, true)
-    
-    app.current_page = "image_tile"
 
-    local texture_element = app.pages.image_tile[1]
     for i = 1, 6 do
         local image = photos[i + pos.y * 2]
         if image then
@@ -63,18 +67,31 @@ local function render_gallery()
 
             -- set texture
             local center = marker.pos + marker.size * 0.5
+            local texture_element = app.pages.image_tile[1]
             texture_element.texture = image[2]
             texture_element.size = 46 / math.min(image[2].width, image[2].height)
             texture_element.pos = center - texture_element.size * image[2]:getDimensions() * 0.5 
 
             -- draw
+            app.current_page = "image_tile"
             app.redraw({-i}, true)
+
+            -- select
+            local isSelected = i == 1
+            if isSelected then
+                app.current_page = "selected_photo"
+                for _, v in ipairs(selected_photo_lines) do
+                    app.pages.selected_photo[1].pos = v.xy + marker.pos
+                    app.pages.selected_photo[1].size = v.zw
+                    app.redraw({1}, false)
+                end
+            end
         end
         ::next::
     end
-    texture_element.texture = nil
+    app.pages.image_tile.texture = nil
+    
     app.current_page = "main"
-
     app.redraw({1})
 end
 
@@ -89,7 +106,7 @@ local function setPage(page)
     end
 end
 
-function app.events.init()
+function app.events.open()
     setPage()
 end
 

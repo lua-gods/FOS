@@ -84,7 +84,7 @@ function page_install()
 end
     
 -- called when app opened --
-function app.events.init()
+function app.events.open()
     if configAppManager.app_to_import then
         page_install()
     else

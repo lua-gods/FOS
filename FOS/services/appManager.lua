@@ -154,11 +154,15 @@ function APP.open(name, ...)
         return
     end
 
+    if APP.app then
+        eventManager.runEvent("CLOSE", ...)
+    end
+
     APP.app = app_to_load
 
     APP.app.current_page = nil
 
-    eventManager.runEvent("INIT", ...)
+    eventManager.runEvent("OPEN", ...)
 
     if APP.app.current_page == nil then
         appManager.setPage()
@@ -210,6 +214,7 @@ function APP.loadApps()
 
     loading_apps = false
 
+    APP.app = nil
     APP.open()
 end
 

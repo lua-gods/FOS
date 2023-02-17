@@ -142,7 +142,7 @@ function app.events.key_press(key)
 end
 
 -- init
-function app.events.init()
+function app.events.open()
     input_text_update("")
     app.setPage("main")
 end

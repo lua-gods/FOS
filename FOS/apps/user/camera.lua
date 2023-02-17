@@ -36,7 +36,7 @@ local function set_toast(str, time)
     app.redraw({2})
 end
 
-function app.events.init()
+function app.events.open()
     landscape_mode = false
     app.setPage("portrait")
     drawing_process = 0
