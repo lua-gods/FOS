@@ -110,6 +110,10 @@ function app.events.open()
     setPage()
 end
 
+function app.events.close()
+    photos = {}
+end
+
 function app.events.tick()
 
 end
