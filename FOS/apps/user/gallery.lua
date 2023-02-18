@@ -75,7 +75,7 @@ local function render_gallery()
     local y_limit = math.ceil(#photos * 0.5) - 1
     local image_offset = pos.y * 2
     local selected = pos.x + 1
-    local y_offset
+    local y_offset = 0
     if pos.y == 0 then
         y_offset = 0
     elseif pos.y == y_limit then

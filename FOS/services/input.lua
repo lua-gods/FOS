@@ -74,7 +74,7 @@ function press(key)
         raster.draw({currently_selected, new_selected})
     end
 
-    if play_sound then
+    if play_sound and player:isLoaded() then
         sounds:playSound("ui.button.click", player:getPos(), 0.25, 2)
     end
 
