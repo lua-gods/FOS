@@ -2,10 +2,11 @@
 local themes = {
     light = {
         background = vec(1, 1, 1, 1),
+        accent = nil, -- accent
 
         text = vec(0, 0, 0, 1),
         text_locked = vec(0.4, 0.4, 0.4, 1),
-        text_select = vec(0, 0.8, 0.5, 1),
+        text_select = nil, -- accent
         
         texture = vec(1, 1, 1, 1),
         texture_select = vec(0.75, 0.75, 0.75, 1),
@@ -15,9 +16,11 @@ local themes = {
     },
     dark = {
         background = vec(0.1, 0.1, 0.1, 1),
+        accent = nil, -- accent
+
         text = vec(1, 1, 1, 1),
         text_locked = vec(0.6, 0.6, 0.6, 1),
-        text_select = vec(0.42, 0.51, 0.89, 1),
+        text_select = nil, -- accent
 
         texture = vec(1, 1, 1, 1),
         texture_select = vec(0.75, 0.75, 0.75, 1),
@@ -30,7 +33,18 @@ local themes = {
 local themeManager = {themes = themes}
 
 function themeManager.updateTheme()
+    -- apply theme
     themes.default = themes[PUBLIC_REGISTRY.theme] or themes.light
+    -- apply accent color
+    themes.default.accent = PUBLIC_REGISTRY.accent_color.rgb_
+    themes.default.accent.a = 1
+    
+    local color = vectors.rgbToHSV(PUBLIC_REGISTRY.accent_color)
+    color.y = math.lerp(color.y, 0.5, 0.75)
+    color.z = math.lerp(color.z, 0.75, 0.5)
+    
+    themes.default.text_select = vectors.hsvToRGB(color).rgb_
+    themes.default.text_select.a = 1
 end 
 
 themeManager.updateTheme()

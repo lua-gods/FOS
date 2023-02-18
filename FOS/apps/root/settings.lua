@@ -40,21 +40,63 @@ app.pages["main"] = {
 }
 
 -- presonalization tab
-app.pages["main.personalization"] = {
-    {type = "rectangle", size = vec(96, 8)},
-    {type = "text", text = "personalization"},
-
-    {
-        type = "text", pos = vec(0, 8 * 2),
-        text = "theme: "..PUBLIC_REGISTRY.theme,
-        pressAction = function(obj)
-            PUBLIC_REGISTRY.save("theme", PUBLIC_REGISTRY.theme == "light" and "dark" or "light")
-            themeManager.updateTheme()
-            obj.text = "theme: "..PUBLIC_REGISTRY.theme
-            app.redraw()
-        end
+do
+    local colors = {
+        {vec(1, 0, 0), "red"},
+        {vec(1, 0.5, 0), "orange"},
+        {vec(1, 1, 0), "yellow"},
+        {vec(0, 1, 0), "green"},
+        {vec(0, 1, 1), "light blue"},
+        {vec(0, 0, 1), "blue"},
+        {vec(0.75, 0, 1), "purple"},
+        {vec(1, 0, 0.375), "pink"},
     }
-}
+    local function setAccent(update)
+        local current_accent = -1
+        for i, v in ipairs(colors) do
+            if v[1] == PUBLIC_REGISTRY.accent_color then
+                current_accent = i
+                break
+            end
+        end
+        
+        if update then
+            if current_accent == -1 then
+                current_accent = 1
+            else
+                current_accent = current_accent % #colors + 1
+            end
+            PUBLIC_REGISTRY.accent_color = colors[current_accent][1]
+            PUBLIC_REGISTRY.save()
+            themeManager.updateTheme()
+        end
+
+        app.pages["main.personalization"][4].text = "accent: "..(colors[current_accent] and colors[current_accent][2] or "unknown")
+
+        if update then
+            app.redraw({-1})
+        end
+    end
+
+    app.pages["main.personalization"] = {
+        {type = "rectangle", size = vec(96, 8)},
+    {type = "text", text = "personalization"},
+    {
+            type = "text", pos = vec(0, 8 * 2),
+            text = "theme: "..PUBLIC_REGISTRY.theme,
+            pressAction = function(obj)
+                PUBLIC_REGISTRY.save("theme", PUBLIC_REGISTRY.theme == "light" and "dark" or "light")
+                themeManager.updateTheme()
+                obj.text = "theme: "..PUBLIC_REGISTRY.theme
+                app.redraw()
+            end
+        },
+        {type = "text", pos = vec(0, 8 * 3), text = "accent: ", pressAction = function() setAccent(true) end},
+        [-1] = {type = "marker", pos = vec(0, 8 * 3), size = vec(96, 8)}
+    }
+
+    setAccent()
+end
 
 -- apps tab
 do
