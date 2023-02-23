@@ -6,35 +6,49 @@ local themeManager = require(FOS_RELATIVE_PATH..".services.themeManager")
 local raster = {}
 local draw_area = vec(0, 0, 0, 0) -- limit drawing
 
--- screen
-local screen_portrait = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_portrait", SYSTEM_REGISTRY.resolution.x, SYSTEM_REGISTRY.resolution.y)
-local screen_landscape = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_landscape", SYSTEM_REGISTRY.resolution.y, SYSTEM_REGISTRY.resolution.x)
+-- screens --
+local screen_resolutions = {
+   portrait = vec(SYSTEM_REGISTRY.resolution.x, SYSTEM_REGISTRY.resolution.y),
+   landscape = vec(SYSTEM_REGISTRY.resolution.y, SYSTEM_REGISTRY.resolution.x),
+}
+local screens = {
+   portrait = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_portrait", screen_resolutions.portrait.x, screen_resolutions.portrait.y),
+   landscape = textures:newTexture(SYSTEM_REGISTRY.system_name..".screen_landscape", screen_resolutions.landscape.x, screen_resolutions.landscape.y),
+}
+local screen_multipliers = {
+   portrait = 1,
+   landscape = 0.5,
+}
+local current_screen = nil
+local screen_size = screen_resolutions.portrait
 
-local current_screen = screen_portrait
-local screen_size = SYSTEM_REGISTRY.resolution
 
-local landscape_mode_uv_matrix = matrices.mat3(
-   vec(1, 0, 0),
-   vec(0, 1, 0),
-   vec(0, 0, 1)
-):rotate(0, 0, -90)
-
-local function set_screen_mode()
+local landscape_mode_uv_matrix = matrices.mat3():rotate(0, 0, -90)
+local function set_screen(page)
+   local screen_type = "portrait"
+   local current_screen_multiplier = page.resolution_multiplier or 1
    if APP.landscapeMode() then
-      current_screen = screen_landscape
-      screen_size = SYSTEM_REGISTRY.resolution.yx
-
+      screen_type = "landscape"
       SYSTEM_REGISTRY.screen_model:setUVMatrix(landscape_mode_uv_matrix)
    else
-      current_screen = screen_portrait
-      screen_size = SYSTEM_REGISTRY.resolution
       SYSTEM_REGISTRY.screen_model:setUVMatrix(matrices.mat3())
    end
+
+   if screen_multipliers[screen_type] ~= current_screen_multiplier then
+      screen_multipliers[screen_type] = current_screen_multiplier
+      screens[screen_type] = textures:newTexture(
+         SYSTEM_REGISTRY.system_name..".screen_"..screen_type,
+         screen_resolutions[screen_type].x * screen_multipliers[screen_type],
+         screen_resolutions[screen_type].y * screen_multipliers[screen_type]
+      )
+   end
+   current_screen = screens[screen_type]
+   screen_size = screen_resolutions[screen_type] * screen_multipliers[screen_type]
 
    SYSTEM_REGISTRY.screen_model:setPrimaryTexture("CUSTOM", current_screen)
 end
 
--- pixel functions
+-- pixel functions --
 local function setPixel(x, y, rgba)
    if x >= draw_area.x and y >= draw_area.y and x < draw_area.z and y < draw_area.w then
       current_screen:setPixel(x, y, rgba)
@@ -208,7 +222,7 @@ end
 function raster.draw(elements, dont_update)
    local page = APP.app.pages[APP.app.current_page]
    
-   set_screen_mode()
+   set_screen(page)
 
    set_draw_area(page, elements)
 
