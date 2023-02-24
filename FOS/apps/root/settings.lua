@@ -36,7 +36,8 @@ app.pages["main"] = {
     {type = "text", text = app.display_name},
     {type = "text", text = "personalization", pos = vec(0, 8 * 2), pressAction = function() setPage("main.personalization") end},
     {type = "text", text = "apps", pos = vec(0, 8 * 3), pressAction = function() setPage("main.apps") end},
-    {type = "text", text = "about", pos = vec(0, 8 * 4), pressAction = function() setPage("main.about") end},
+    {type = "text", text = "accessibility", pos = vec(0, 8 * 4), pressAction = function() setPage("main.accessibility") end},
+    {type = "text", text = "about", pos = vec(0, 8 * 5), pressAction = function() setPage("main.about") end},
 }
 
 -- presonalization tab
@@ -266,6 +267,32 @@ do
             setPage("main.apps.app")
         end},
         {type = "text", text = "no", pos = vec(0, 136), pressAction = function() goPageBack() end},
+    }
+end
+
+-- accessibility
+do
+    function app.events.keyboard(text, sent)
+        if app.current_page == "main.accessibility" and app.selected_item == 4 then
+            if sent then
+                PUBLIC_REGISTRY.keyboard_prefix = text
+                PUBLIC_REGISTRY.save()
+            end
+            app.pages["main.accessibility"][4].text = text or PUBLIC_REGISTRY.keyboard_prefix
+            app.redraw({5})
+        end
+    end
+
+    app.pages["main.accessibility"] = {
+        load = function(page)
+            page[4].text = PUBLIC_REGISTRY.keyboard_prefix
+        end,
+        {type = "rectangle", size = vec(96, 8)},
+        {type = "text", text = "accessibility"},
+
+        {type = "text", text = "keyboard prefix", pos = vec(0, 16)},
+        {type = "text", text = "registry keyboard prefix", pos = vec(0, 24), pressAction = true},
+        {type = "marker", pos = vec(0, 24), size = vec(96, 8)}
     }
 end
 

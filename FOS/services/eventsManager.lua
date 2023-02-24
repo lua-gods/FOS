@@ -8,6 +8,7 @@ function eventsManager.newEventsTable()
     tbl.CLOSE = KattEventAPI.newEvent()
     tbl.KEY_PRESS = KattEventAPI.newEvent()
     tbl.POST_KEY_PRESS = KattEventAPI.newEvent()
+    tbl.KEYBOARD = KattEventAPI.newEvent()
     tbl.TICK = KattEventAPI.newEvent()
     tbl.RENDER = KattEventAPI.newEvent()
 

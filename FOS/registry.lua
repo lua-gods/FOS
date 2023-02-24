@@ -22,6 +22,7 @@ SYSTEM_REGISTRY = {
 
 PUBLIC_REGISTRY = { -- default values, public registry is loaded in registry manager
    save = nil, -- save public registry
-   theme = "light",
-   accent_color = vec(0, 1, 0)
+   theme = {default = "light"},
+   accent_color = {default = vec(0, 1, 0)},
+   keyboard_prefix = {default = ">", length = vec(1, 6)},
 }

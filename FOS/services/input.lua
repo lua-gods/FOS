@@ -27,7 +27,7 @@ for key_path, display_name in pairs(key_names) do
     keys[display_name] = key
 end
 
-
+-- keybinds
 function press(key)
     if SYSTEM_REGISTRY.disable_system then
         return false
@@ -89,8 +89,46 @@ function input.isPressed(key)
     end
 end
 
+-- keyboard
+local chat_text = nil
+local was_typing_message = false
+
+local function getChatMessage(str)
+    if not str then
+        return false, nil
+    end
+    return str:sub(1, #PUBLIC_REGISTRY.keyboard_prefix) == PUBLIC_REGISTRY.keyboard_prefix, str:sub(#PUBLIC_REGISTRY.keyboard_prefix + 1, -1)
+end
+
+function events.CHAT_SEND_MESSAGE(str)
+    local used_prefix, text = getChatMessage(str)
+    if used_prefix then
+        host:appendChatHistory(str)
+        was_typing_message = false
+        eventsManager.runEvent("KEYBOARD", text, true)
+    else
+        return str
+    end
+end
+
+-- tick
 function events.tick()
+    -- keybinds
     go_to_home_time = math.max(go_to_home_time - 1, 0)
+    -- keyboard
+    local new_chat_text = host:getChatText()
+    if new_chat_text ~= chat_text then
+        chat_text = new_chat_text
+        local used_prefix, text = getChatMessage(chat_text)
+        if used_prefix then
+            was_typing_message = true
+            eventsManager.runEvent("KEYBOARD", text, false)
+        elseif was_typing_message then
+            eventsManager.runEvent("KEYBOARD", nil, false)
+        end
+
+        host:setChatColor(used_prefix and PUBLIC_REGISTRY.accent_color or vec(1, 1, 1))
+    end
 end
 
 return input
