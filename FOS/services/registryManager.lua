@@ -31,4 +31,10 @@ if type(data) == "table" then
             end
         end
     end
+else
+    for name, value in pairs(PUBLIC_REGISTRY) do
+        if name ~= "save" then
+            PUBLIC_REGISTRY[name] = value.default
+        end
+    end
 end
