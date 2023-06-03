@@ -20,6 +20,9 @@ local current_page = 0
 local apps = {}
 local appElementList = {}
 local requests = {}
+local appsListElementOffset = 0
+local request_functions
+local last_selected_app_item = 0
 
 -- lutils --
 local http = lutils and lutils.http
@@ -54,6 +57,7 @@ app.pages["error"] = { -- app error
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = app.display_name},
     {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96},
+    {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96},
 }
 
 app.pages["main"] = { -- app list
@@ -61,6 +65,14 @@ app.pages["main"] = { -- app list
     {type = "text", text = app.display_name},
 }
 
+app.pages["appMenu"] = {
+    {type = "rectangle", size = vec(96, 8)},
+    {type = "text", text = app.display_name},
+    {type = "text", text = "no app", pos = vec(0, 8 + 4)}, -- name
+    {type = "text", text = "description", wrap_after = 96, pos = vec(0, 8 * 3)}, -- description
+}
+
+appsListElementOffset = #app.pages["main"]
 for i = 1, appsPerPage do
     table.insert(app.pages["main"], {
         type = "text",
@@ -88,8 +100,11 @@ local function updateAppList(dont_redraw)
 end
 
 -- request functions
-local request_functions = {
+request_functions = {
     getList = function(res, code, data)
+        if code ~= 200 then
+            return
+        end
         apps = {}
         for text in data:gmatch("[^\n]*\n?") do
             local id, owner, name = text:match("[^\n]*"):match("([^;]*);([^;]*);(.*)")
@@ -101,9 +116,16 @@ local request_functions = {
                 })
             end
         end
-
         table.sort(apps, function(a, b) return a.name < b.name end)
         updateAppList()
+    end,
+    openAppMenu = function(res, code, data)
+        if code ~= 200 then
+            return
+        end
+        last_selected_app_item = app.selected_item
+        app.setPage("appMenu")
+        print(data)
     end
 }
 
@@ -126,14 +148,29 @@ function app.events.open()
 end
 
 -- switching pages
-function app.events.key_press(key)
+function app.events.post_key_press(key)
     if app.current_page == "main" then
+        local limit = math.max(math.ceil(#apps / appsPerPage - 1), 0)
         if key == "LEFT" then
             current_page = math.max(current_page - 1, 0)
             updateAppList()
         elseif key == "RIGHT" then
-            current_page = math.clamp(current_page + 1, 0, math.ceil(#apps / appsPerPage - 1))
+            current_page = math.min(current_page + 1, limit)
             updateAppList()
+        end
+        if current_page == limit then
+            local limit_of_page = #apps % appsPerPage + appsListElementOffset
+            
+            if app.selected_item > limit_of_page then
+                app.selected_item = limit_of_page
+                app.redraw()
+            end
+        end
+    elseif app.current_page == "appMenu" then
+        if key == "LEFT" then
+            app.setPage("main")
+            app.selected_item = last_selected_app_item
+            app.redraw()
         end
     end
 end
