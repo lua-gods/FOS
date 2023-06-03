@@ -35,12 +35,29 @@ function configAppManager.install()
     config:save("app", nil)
 
     config:setName(SYSTEM_REGISTRY.system_name..".apps")
-    configAppManager.apps[configAppManager.app_to_import_name] = configAppManager.app_to_import
+    if configAppManager.app_to_import_name:sub(1, 7) == "CONFIG." then
+        configAppManager.apps[configAppManager.app_to_import_name] = configAppManager.app_to_import
+    else
+        configAppManager.apps["CONFIG."..configAppManager.app_to_import_name] = configAppManager.app_to_import
+    end
     config:save("apps", configAppManager.apps)
 
     configAppManager.app_to_import = nil
     configAppManager.app_to_import_name = nil
     
+    APP.loadApps()
+end
+
+function configAppManager.installFromString(name, code)
+    if name:sub(1, 7) == "CONFIG." then
+        configAppManager.apps[name] = code
+    else
+        configAppManager.apps["CONFIG."..name] = code
+    end
+    
+    config:setName(SYSTEM_REGISTRY.system_name..".apps")
+    config:save("apps", configAppManager.apps)
+
     APP.loadApps()
 end
 
@@ -83,7 +100,14 @@ end
 config:setName(SYSTEM_REGISTRY.system_name..".apps")
 local apps = config:load("apps")
 if type(apps) == "table" then
-    configAppManager.apps = apps
+    configAppManager.apps = {}
+    for i, v in pairs(apps) do
+        if i:sub(1, 7) == "CONFIG." then
+            configAppManager.apps[i] = v
+        else
+            configAppManager.apps["CONFIG."..i] = v
+        end
+    end
 end
 
 return configAppManager

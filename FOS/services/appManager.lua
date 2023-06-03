@@ -155,7 +155,7 @@ function APP.open(name, ...)
     end
 
     if APP.app then
-        eventManager.runEvent("CLOSE", ...)
+        eventManager.runEvent("CLOSE")
     end
 
     APP.app = app_to_load
@@ -195,6 +195,10 @@ function APP.loadApps()
         return
     end
     loading_apps = true
+
+    if APP.app then
+        eventManager.runEvent("CLOSE")
+    end
 
     for _, name in ipairs(listFiles(FOS_RELATIVE_PATH..".apps.root")) do
         loadApp(name, "root")
