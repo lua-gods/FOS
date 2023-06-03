@@ -77,7 +77,7 @@ local render_size = {
       local text = tostring(obj.text)
       local wrap_after = obj.wrap_after or math.huge
 
-      local max_x = 0
+      local max_x = 2
       local x, y = 0, fontManager.fonts[font]["\n"].newline_height * size
       for i = 1, #text do
          local data = fontManager.fonts[font][text:sub(i, i)]
