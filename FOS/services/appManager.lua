@@ -69,43 +69,33 @@ local function loadApp(path, app_type)
         end
     end 
 
-    -- app couldnt be loaded
     if loaded == false or APP.app == nil then
+        -- app couldnt be loaded
         print("could not load: "..path)
         print(tostring(output_error):sub(1, 128))
-        return
-    end
 
-    -- app loaded
-    loaded_apps_count = loaded_apps_count + 1
-
-    APP.app.path = path
-
-    APP.apps[APP.app.id] = APP.app
-
-    -- table.insert(APP.sorted_apps, "")
-
-    local id = APP.app.id
-    local display_name = APP.app.display_name
-    local can_insert = true
-
-    local min, max = 1, #APP.sorted_apps
-    while min <= max do
-        local middle = math.floor((min + max) / 2)
-        local middle_app_name = APP.apps[APP.sorted_apps[middle]].display_name
-        if middle_app_name < display_name then
-            min = middle + 1
-        elseif middle_app_name > display_name then
-            max = middle - 1
-        else
-            can_insert = false
-            break
+        if path:sub(1, 7) == "CONFIG." then -- if its config app, allow user to uninstall it
+            local app = {
+                path = path,
+                can_be_opened = false,
+                display_name = path:sub(8, -1),
+                id = "error:"..path
+            }
+            APP.apps[app.id] = app
+            table.insert(APP.sorted_apps, app.id)
+        else -- dont need to sort
+            return
         end
+    else
+        -- app loaded
+        loaded_apps_count = loaded_apps_count + 1
+
+        APP.app.path = path
+        APP.apps[APP.app.id] = APP.app
+        table.insert(APP.sorted_apps, APP.app.id)
     end
 
-    if can_insert then
-        table.insert(APP.sorted_apps, min, id)
-    end
+    table.sort(APP.sorted_apps, function(a, b) return APP.apps[a].display_name < APP.apps[b].display_name end)
 end
 
 -- begin function for apps

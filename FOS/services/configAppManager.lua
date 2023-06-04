@@ -48,13 +48,19 @@ function configAppManager.install()
     APP.loadApps()
 end
 
-function configAppManager.installFromString(name, code)
-    if name:sub(1, 7) == "CONFIG." then
-        configAppManager.apps[name] = code
-    else
-        configAppManager.apps["CONFIG."..name] = code
+function configAppManager.installFromString(...)
+    local list = {...}
+
+    for i = 1, #list, 2 do
+        local name = list[i]
+        local code = list[i + 1]
+        if name:sub(1, 7) == "CONFIG." then
+            configAppManager.apps[name] = code
+        else
+            configAppManager.apps["CONFIG."..name] = code
+        end
     end
-    
+        
     config:setName(SYSTEM_REGISTRY.system_name..".apps")
     config:save("apps", configAppManager.apps)
 
@@ -73,7 +79,7 @@ function configAppManager.ignore_install()
 end
 
 -- uninstall
-function configAppManager.uninstall(id)    
+function configAppManager.uninstall(id)
     config:setName(SYSTEM_REGISTRY.system_name..".apps")
     local app = APP.apps[id]
     for i, v in ipairs(APP.sorted_apps) do

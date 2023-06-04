@@ -4,34 +4,40 @@ local app = APP.begin("app_store", "app store")
 -- services --
 local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager")
 
---[=[
-configAppManager.installFromString("pink", [[
-local app = APP.begin("installedFromCode", "installed from app store")
-]])
---]=]
-
 -- config --
-local appsPerPage = 14
-local backend_ip = app.data.ip or "http://127.0.0.1:3000/"
+local appsPerPage = 15
+local backend_ip = "https://fosappstorebackend.glitch.me/" --"http://127.0.0.1:3000/"
 local appLoadingText = {{name = "loading apps"}, {name = "might take a while"}}
 
 -- variables --
 local current_page = 0
 local apps = {}
+local searchedApps = {}
 local appElementList = {}
 local requests = {}
 local appsListElementOffset = 0
 local request_functions
 local last_selected_app_item = 0
+local authors = {}
+local selectedApp = nil
+local isInstalled = {} -- 1 = installing, 2 = installed
+local appsToInstall = {}
+local search_query = ""
+local appsToUpdate = {}
+local updateCount = 0
+local appIdToAppPath
+local appPathToAppId
+local updateAppUpdateText
 
 -- lutils --
 local http = lutils and lutils.http
 local readers = lutils and lutils.readers
 local providers = lutils and lutils.providers
 
-local function httpGet(url, func)
+local function httpGet(url, func, data)
     table.insert(requests, {
         func = func,
+        extra_data = data,
         res = http:getAsync(backend_ip..url, readers.string)
         -- res = http:getAsync(url, readers.string)
     })
@@ -41,7 +47,7 @@ function app.events.tick()
     for i, v in pairs(requests) do
         if v.res:isDone() then
             local res = v.res:get()
-            v.func(res, res:getCode(), res:getData())
+            v.func(res, res:getCode(), res:getData(), v.extra_data)
             requests[i] = nil
         end
     end
@@ -56,20 +62,59 @@ end
 app.pages["error"] = { -- app error
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = app.display_name},
-    {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96},
-    {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96},
+    {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96}
 }
 
 app.pages["main"] = { -- app list
     {type = "rectangle", size = vec(96, 8)},
-    {type = "text", text = app.display_name},
+    {type = "text", text = app.display_name, pressAction = function() app.setPage("settings") end},
+    {type = "text", text = "pages", pos = vec(0, 8 * 17)},
+    {type = "text", text = "1-2", pos = vec(0, 8 * 17)}
+}
+
+app.pages["settings"] = { -- settings
+    {type = "rectangle", size = vec(96, 8)},
+    {type = "text", text = "settings"},
+    {type = "text", text = "update apps", pos = vec(0, 16), pressAction = function()
+        if #appsToUpdate >= 1 then
+            return
+        end 
+
+        for path in pairs(configAppManager.apps) do
+            local id = appPathToAppId(path)
+            if id then
+                isInstalled[id] = 2
+                table.insert(appsToUpdate, id)
+            end
+        end
+
+        if #appsToUpdate >= 1 then
+            updateCount = #appsToUpdate
+            updateAppUpdateText()
+            httpGet("api/getApp?id="..appsToUpdate[#appsToUpdate], request_functions.updateApp)
+        end
+    end}
 }
 
 app.pages["appMenu"] = {
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = app.display_name},
-    {type = "text", text = "no app", pos = vec(0, 8 + 4)}, -- name
-    {type = "text", text = "description", wrap_after = 96, pos = vec(0, 8 * 3)}, -- description
+    {type = "text", text = "app", pos = vec(0, 8 + 4)}, -- 3 name
+    {type = "text", text = "author", pos = vec(0, 16 + 4), color="text_locked"}, -- 4 author
+    {type = "text", text = "description", wrap_after = 96, pos = vec(0, 8 * 4)}, -- 5 description
+    {type = "rectangle", size = vec(96, 8), pos = vec(0, 136)},
+    {type = "text", text = "install", pos = vec(0, 136), pressAction = function(element) -- 7 install/update button
+        if element.color == "text_locked" then
+            return
+        end
+
+        element.text = "installing"
+        element.color = "text_locked"
+        isInstalled[selectedApp.id] = 1
+        app.redraw()
+
+        httpGet("api/getApp?id="..selectedApp.id, request_functions.installApp, selectedApp)
+    end},
 }
 
 appsListElementOffset = #app.pages["main"]
@@ -77,25 +122,104 @@ for i = 1, appsPerPage do
     table.insert(app.pages["main"], {
         type = "text",
         text = i,
-        pos = vec(0, i * 8 + 8),
+        pos = vec(0, i * 8 + 4),
         pressAction = true
     })
     table.insert(appElementList, app.pages["main"][#app.pages["main"]])
 end
 
 -- functions
+function updateAppUpdateText(dont_redraw)
+    if #appsToUpdate >= 1 then
+        app.pages["settings"][3].text = "updating: "..(updateCount - #appsToUpdate).."/"..updateCount
+        app.pages["settings"][3].color = "text_locked"
+    else
+        app.pages["settings"][3].text = "update"
+        app.pages["settings"][3].color = "text"
+    end
+
+    if not dont_redraw then
+        app.redraw()
+    end
+end
+
+local function updatePageCounter()
+    local text = (current_page + 1).."/"..math.max(math.ceil(#searchedApps / appsPerPage), 1)
+
+    app.pages["main"][4].text = text
+    app.pages["main"][4].pos.x = 96 - #text * 6
+end
+
+local function updateSearch()
+    searchedApps = {}
+    for i, v in pairs(apps) do
+        if v.name:match(search_query) then
+            table.insert(searchedApps, v)
+        end
+    end
+end
+
+function appIdToAppPath(id)
+    return "CONFIG.appStore."..id
+end
+
+function appPathToAppId(path)
+    if path:sub(1, 16) == "CONFIG.appStore." then
+        return path:sub(17, -1)
+    end
+end
+
 local function updateAppList(dont_redraw)
     for i = 1, appsPerPage do
-        local selectedApp = apps[i + appsPerPage * current_page]
-        if selectedApp then
-            appElementList[i].text = selectedApp.name
+        local appI = searchedApps[i + appsPerPage * current_page]
+        if appI then
+            appElementList[i].text = appI.name
         else
             appElementList[i].text = ""
         end
     end
 
+    updatePageCounter()
+
     if not dont_redraw then
         app.redraw()
+    end
+end
+
+local function openAppMenu(appToOpen)
+    last_selected_app_item = app.selected_item
+    selectedApp = appToOpen
+
+    app.pages["appMenu"][3].text = appToOpen.name
+    if authors[appToOpen.owner] then
+        app.pages["appMenu"][4].text = authors[appToOpen.owner]
+    else
+        app.pages["appMenu"][4].text = appToOpen.owner
+        httpGet("api/getName?id="..appToOpen.owner, request_functions.getAuthor, appToOpen.owner)
+    end
+    if appToOpen.description then
+        app.pages["appMenu"][5].text = appToOpen.description
+    else
+        app.pages["appMenu"][5].text = "loading"
+        httpGet("api/getDescription?id="..appToOpen.id, request_functions.getDescription, appToOpen)
+    end
+    if configAppManager.apps[appIdToAppPath(appToOpen.id)] or isInstalled[appToOpen.id] == 2 then
+        app.pages["appMenu"][7].text = "installed"
+        app.pages["appMenu"][7].color = "text_locked"
+    elseif isInstalled[appToOpen.id] == 1 then
+        app.pages["appMenu"][7].text = "installing"
+        app.pages["appMenu"][7].color = "text_locked"
+    else
+        app.pages["appMenu"][7].text = "install"
+        app.pages["appMenu"][7].color = "text"
+    end
+
+    app.setPage("appMenu")
+end
+
+for i = 1, appsPerPage do
+    appElementList[i].pressAction = function()
+        openAppMenu(searchedApps[i + appsPerPage * current_page])
     end
 end
 
@@ -117,16 +241,67 @@ request_functions = {
             end
         end
         table.sort(apps, function(a, b) return a.name < b.name end)
+        updateSearch()
         updateAppList()
     end,
-    openAppMenu = function(res, code, data)
+    getDescription = function(res, code, data, extra_data)
         if code ~= 200 then
             return
         end
-        last_selected_app_item = app.selected_item
-        app.setPage("appMenu")
-        print(data)
-    end
+        extra_data.description = data
+        if app.current_page == "appMenu" then
+            if selectedApp == extra_data then
+                app.pages["appMenu"][5].text = data
+            end
+            app.redraw()
+        end
+    end,
+    getAuthor = function(res, code, data, extra_data)
+        if code ~= 200 then
+            return
+        end
+        authors[extra_data] = data
+        if app.current_page == "appMenu" then
+            if selectedApp.owner == extra_data then
+                app.pages["appMenu"][4].text = data
+            end
+            app.redraw()
+        end
+    end,
+    installApp = function(res, code, data, extra_data)
+        if code ~= 200 then
+            return
+        end
+        isInstalled[extra_data.id] = 2
+        app.pages["appMenu"][7].text = "installed"
+        app.pages["appMenu"][7].color = "text_locked"
+        app.redraw()
+        table.insert(appsToInstall, appIdToAppPath(extra_data.id))
+        table.insert(appsToInstall, data)
+    end,
+    updateApp = function(res, code, data, extra_data)
+        if code ~= 200 then
+            return
+        end
+
+        if data ~= "" then
+            local path = appIdToAppPath(appsToUpdate[#appsToUpdate])
+            for _, v in pairs(APP.apps) do
+                if v.path == path then
+                    configAppManager.uninstall(v.id)
+                    break
+                end 
+            end
+            table.insert(appsToInstall, path)
+            table.insert(appsToInstall, data)
+        end
+
+        appsToUpdate[#appsToUpdate] = nil
+        if #appsToUpdate >= 1 then
+            httpGet("api/getApp?id="..appsToUpdate[#appsToUpdate], request_functions.updateApp)
+        end
+        updateAppUpdateText()
+    end,
 }
 
 -- open
@@ -140,9 +315,15 @@ function app.events.open()
     end
 
     -- no errors
+    isInstalled = {}
     current_page = 0
     requests = {}
     apps = appLoadingText
+    search_query = ""
+    updateSearch()
+
+    appsToInstall = {}
+    updateAppUpdateText(true)
     updateAppList(true)
     httpGet("api/list", request_functions.getList)
 end
@@ -150,7 +331,7 @@ end
 -- switching pages
 function app.events.post_key_press(key)
     if app.current_page == "main" then
-        local limit = math.max(math.ceil(#apps / appsPerPage - 1), 0)
+        local limit = math.max(math.ceil(#searchedApps / appsPerPage - 1), 0)
         if key == "LEFT" then
             current_page = math.max(current_page - 1, 0)
             updateAppList()
@@ -159,7 +340,7 @@ function app.events.post_key_press(key)
             updateAppList()
         end
         if current_page == limit then
-            local limit_of_page = #apps % appsPerPage + appsListElementOffset
+            local limit_of_page = #searchedApps % appsPerPage + appsListElementOffset
             
             if app.selected_item > limit_of_page then
                 app.selected_item = limit_of_page
@@ -172,5 +353,28 @@ function app.events.post_key_press(key)
             app.selected_item = last_selected_app_item
             app.redraw()
         end
+    elseif app.current_page == "settings" then
+        if key == "LEFT" then
+            app.setPage("main")
+        end
+    end
+end
+
+-- quit app
+function app.events.close()
+    if #appsToInstall >= 2 then
+        configAppManager.installFromString(table.unpack(appsToInstall))
+    end
+    appsToInstall = {}
+    isInstalled = {}
+end
+
+-- search
+function app.events.keyboard(text, sent)
+    if app.current_page == "main" then
+        app.pages.main[2].text = text ~= "" and text or app.display_name
+        search_query = text or ""
+        updateSearch()
+        updateAppList()
     end
 end
