@@ -17,7 +17,7 @@ function app.events.keyboard(text, sent)
     text_element.text = text or ""
     if sent then
         text_element.text = ""
-        pcall(loadstring(text))
+        pcall(loadstring(text.." "))
     end
     app.redraw({3})
 end

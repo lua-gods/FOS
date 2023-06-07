@@ -17,6 +17,7 @@ SYSTEM_REGISTRY = {
    },
    screen_model = models.FOS.phone.base.screen,
    home_app = "root:home",
+   error_app = "root:error",
    disable_system = false, -- enabled when FOS is in pocket
 }
 

@@ -7,10 +7,11 @@ local configAppManager = require(FOS_RELATIVE_PATH..".services.configAppManager"
 -- config --
 local appsPerPage = 15
 local backend_ip = "https://fosappstorebackend.glitch.me/" --"http://127.0.0.1:3000/"
-local appLoadingText = {{name = "loading apps"}, {name = "might take a while"}}
+local appLoadingText = {{name = "loading apps", locked = true}, {name = "might take a while", locked = true}}
+local welcomeText = "Welcome to\nfos app store\n\nclick left or right\nto switch between\npages\n\nyou can upload\nyour apps at:\n"..backend_ip..'\ntip: you can click\n"app store" text\nat top'
 
 -- variables --
-local current_page = 0
+local current_page = -1
 local apps = {}
 local searchedApps = {}
 local appElementList = {}
@@ -69,7 +70,8 @@ app.pages["main"] = { -- app list
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = app.display_name, pressAction = function() app.setPage("settings") end},
     {type = "text", text = "pages", pos = vec(0, 8 * 17)},
-    {type = "text", text = "1-2", pos = vec(0, 8 * 17)}
+    {type = "text", text = "1-2", pos = vec(0, 8 * 17)},
+    {type = "text", text = "welcome", pos = vec(0, 12), wrap_after = 96},
 }
 
 app.pages["settings"] = { -- settings
@@ -144,10 +146,17 @@ function updateAppUpdateText(dont_redraw)
 end
 
 local function updatePageCounter()
-    local text = (current_page + 1).."/"..math.max(math.ceil(#searchedApps / appsPerPage), 1)
+    local text = current_page + 1
+    local offset = 0
+    if current_page == -1 then
+        text = "info"
+        offset = offset + 5
+    end
+    
+    text = text.."/"..math.max(math.ceil(#searchedApps / appsPerPage), 1)
 
     app.pages["main"][4].text = text
-    app.pages["main"][4].pos.x = 96 - #text * 6
+    app.pages["main"][4].pos.x = 96 - #text * 6 + offset
 end
 
 local function updateSearch()
@@ -181,12 +190,18 @@ local function updateAppList(dont_redraw)
 
     updatePageCounter()
 
+    app.pages.main[5].text = current_page == -1 and welcomeText or ""
+
     if not dont_redraw then
         app.redraw()
     end
 end
 
 local function openAppMenu(appToOpen)
+    if appToOpen == nil or appToOpen.locked then
+        return
+    end
+
     last_selected_app_item = app.selected_item
     selectedApp = appToOpen
 
@@ -308,7 +323,7 @@ request_functions = {
 function app.events.open()
     -- errors
     if not lutils then
-        return app_error("lutils not found")
+        return app_error("lutils not found\nyou can download\nlutils at:\nhttps://github.com/lexize/lutils\n\ngo to actions tab\nto download latest\nversion (requires github account)")
     end
     if not http:canSendHTTPRequests() then
         return app_error("Avatar don't have permission for sending HTTP requests")
@@ -316,7 +331,7 @@ function app.events.open()
 
     -- no errors
     isInstalled = {}
-    current_page = 0
+    current_page = -1
     requests = {}
     apps = appLoadingText
     search_query = ""
@@ -331,9 +346,9 @@ end
 -- switching pages
 function app.events.post_key_press(key)
     if app.current_page == "main" then
-        local limit = math.max(math.ceil(#searchedApps / appsPerPage - 1), 0)
+        local limit = math.max(math.ceil(#searchedApps / appsPerPage - 1), -1)
         if key == "LEFT" then
-            current_page = math.max(current_page - 1, 0)
+            current_page = math.max(current_page - 1, -1)
             updateAppList()
         elseif key == "RIGHT" then
             current_page = math.min(current_page + 1, limit)
@@ -341,7 +356,6 @@ function app.events.post_key_press(key)
         end
         if current_page == limit then
             local limit_of_page = #searchedApps % appsPerPage + appsListElementOffset
-            
             if app.selected_item > limit_of_page then
                 app.selected_item = limit_of_page
                 app.redraw()

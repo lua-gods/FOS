@@ -131,17 +131,24 @@ end
 
 -- open app
 function APP.open(name, ...)
-    local app_to_load = APP.apps[name] 
+    local app_to_load = APP.apps[name]
+    local custom_data = nil
     if app_to_load == nil then
         if type(name) == "string" then
             app_to_load = APP.apps["root:"..name] or APP.apps["user:"..name]
         else
             app_to_load = APP.apps[SYSTEM_REGISTRY.home_app]
         end
-    end
-
-    if app_to_load == nil then
-        return
+        if app_to_load == nil then
+            app_to_load = APP.apps[SYSTEM_REGISTRY.error_app]
+            custom_data = "home screen app not found"
+        end
+        if app_to_load == nil then
+            app_to_load = {pages = {main = {
+                {type = "rectangle", color = vec(0, 0, 0, 1), size = vec(1000, 1000)},
+                {type = "text", text = "home screen app\nand error app\nnot found", color = vec(1, 1, 1, 1)}
+            }}}
+        end
     end
 
     if APP.app then
@@ -152,7 +159,11 @@ function APP.open(name, ...)
 
     APP.app.current_page = nil
 
-    eventManager.runEvent("OPEN", ...)
+    if custom_data then
+        eventManager.runEvent("OPEN", custom_data)
+    else
+        eventManager.runEvent("OPEN", ...)
+    end
 
     if APP.app.current_page == nil then
         appManager.setPage()
@@ -175,7 +186,7 @@ function appManager.setPage(page_name)
 end
 
 function APP.landscapeMode()
-    return APP.app.pages[APP.app.current_page].orientation == true or APP.app.pages[APP.app.current_page].orientation == 1 or APP.app.pages[APP.app.current_page].orientation == "landscape"
+    return APP.app and (APP.app.pages[APP.app.current_page].orientation == true or APP.app.pages[APP.app.current_page].orientation == 1 or APP.app.pages[APP.app.current_page].orientation == "landscape")
 end
 
 -- Load apps that are not loaded

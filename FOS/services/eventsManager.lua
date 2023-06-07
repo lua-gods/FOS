@@ -16,7 +16,14 @@ function eventsManager.newEventsTable()
 end
 
 function eventsManager.runEvent(event_name, ...)
-    APP.app.events[event_name](...)
+    if APP.app and APP.app.events then
+        local success, err = pcall(APP.app.events[event_name], ...)
+        if not success then
+            if APP.app.id ~= SYSTEM_REGISTRY.error_app then
+                APP.open(SYSTEM_REGISTRY.error_app, "app crashed:\n"..(APP.app.display_name or APP.app.id).."\n\npress enter to go to home screen\npress up to print\nerror\n\n"..tostring(err), tostring(err))
+            end
+        end
+    end
 end
 
 function events.tick()
