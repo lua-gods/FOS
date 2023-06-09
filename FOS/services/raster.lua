@@ -151,7 +151,7 @@ local draw_functions = {
       end
    
       if select_color then
-         fillPixels(render_pos.x, render_pos.y, 1, font_height - 1, select_color)
+         fillPixels(render_pos.x, render_pos.y, 1, font_height, select_color)
       end
    end,
    texture = function(obj, color, select_color)
