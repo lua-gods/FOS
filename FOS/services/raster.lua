@@ -17,7 +17,7 @@ local screens = {
 }
 local screen_multipliers = {
    portrait = 1,
-   landscape = 0.5,
+   landscape = 1,
 }
 local current_screen = nil
 local screen_size = screen_resolutions.portrait
