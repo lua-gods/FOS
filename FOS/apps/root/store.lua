@@ -63,7 +63,7 @@ end
 app.pages["error"] = { -- app error
     {type = "rectangle", size = vec(96, 8)},
     {type = "text", text = app.display_name},
-    {type = "text", pos = vec(0, 16), text = "no error\nhere is bunny:\n/)_/)\n{  .  . }\n/      >", wrap_after = 96}
+    {type = "text", pos = vec(0, 16), text = "meow", wrap_after = 96}
 }
 
 app.pages["main"] = { -- app list
