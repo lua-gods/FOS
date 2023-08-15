@@ -56,7 +56,7 @@ end
 
 -- pages --
 local function app_error(text)
-    app.pages["error"][3].text = "error:\n"..text
+    app.pages["error"][3].text = text
     app.setPage("error")
 end
 
@@ -322,11 +322,14 @@ request_functions = {
 -- open
 function app.events.open()
     -- errors
+    do
+        return app_error("sorry fos app\nstore has been\narchived")
+    end
     if not lutils then
-        return app_error("lutils not found\nyou can download\nlutils at:\nhttps://github.com/lexize/lutils\n\ngo to actions tab\nto download latest\nversion (requires github account)")
+        return app_error("error:\nlutils not found\nyou can download\nlutils at:\nhttps://github.com/lexize/lutils\n\ngo to actions tab\nto download latest\nversion (requires github account)")
     end
     if not http:canSendHTTPRequests() then
-        return app_error("Avatar don't have permission for sending HTTP requests")
+        return app_error("error:\nAvatar don't have permission for sending HTTP requests")
     end
 
     -- no errors
