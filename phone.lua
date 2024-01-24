@@ -69,7 +69,7 @@ events.RENDER:register(function(dt, context)
    local orientation = APP and APP.landscapeMode() and "landscape" or "portrait"
 
    local render_type = nil
-   if client.hasIrisShader() then
+   if client.hasShaderPack() then
       if context == "FIRST_PERSON" or context == "OTHER" then
          render_type = 1
       else
